@@ -34,8 +34,6 @@ You are working with the **MCP MySQL Operations Server**, a powerful tool that p
 
 ## Tool Usage Examples
 
-### 📸 **[More Examples with Screenshots →](https://github.com/call518/MCP-MySQL-Ops/wiki/Tool-Usage-Example)**
-
 ---
 
 ![MCP-MySQL-Ops Usage Screenshot](img/screenshot-000.png)
@@ -43,59 +41,6 @@ You are working with the **MCP MySQL Operations Server**, a powerful tool that p
 ---
 
 ![MCP-MySQL-Ops Usage Screenshot](img/screenshot-001.png)
-
----
-
-## ⭐ Quickstart (5 minutes)
-
-> **Note:** The `mysql` container included in `docker-compose.yml` is intended for quickstart testing purposes only. You can connect to your own MySQL instance by adjusting the environment variables as needed.
-
-> **If you want to use your own MySQL instance instead of the built-in test container:**
-> - Update the target MySQL connection information in your `.env` file (see MYSQL_HOST, MYSQL_PORT, MYSQL_USER, MYSQL_PASSWORD, MYSQL_DB).
-> - In `docker-compose.yml`, comment out (disable) the `mysql` and `mysql-init-data` containers to avoid starting the built-in test database.
-
-### 1. Environment Setup
-
-> **Note**: While root privileges provide access to all databases and system information, the MCP server also works with regular user permissions for basic monitoring tasks.
-
-```bash
-git clone https://github.com/call518/MCP-MySQL-Ops.git
-cd MCP-MySQL-Ops
-
-### Check and modify .env file
-```bash
-cp .env.example .env
-```
-
-### No need to modify defaults, but if using your own MySQL server, edit below:
-```bash
-MYSQL_HOST=host.docker.internal
-MYSQL_PORT=13306
-MYSQL_USER=root
-MYSQL_PASSWORD=changeme!@34
-MYSQL_DATABASE=test_ecommerce # Default connection DB. Root users can access all DBs.
-```
-
-> **Note**: The MySQL container uses standard data directory paths for proper operation.
-
-### 🔧 **Advanced Capabilities**
-- Version-aware I/O statistics (enhanced on MySQL 8.0+).
-- Real-time connection and lock monitoring.
-- InnoDB engine monitoring and analysis.
-- Replication status and binary log monitoring.
-- Database capacity and bloat analysis.
-
-## Tool Usage Examples
-
-### 📸 **[More Examples with Screenshots →](https://github.com/call518/MCP-MySQL-Ops/wiki/Tool-Usage-Example)**
-
----
-
-![MCP-MySQL-Ops Usage Screenshot](img/screenshot-000.png)
-
----
-
-![MCP-MySQL-Ops Usage Screenshot](img/screenshot-005.png)
 
 ---
 
@@ -147,37 +92,6 @@ MYSQL_DATABASE=your_default_db
 ```
 
 > **Note**: The MySQL container is configured with proper volume mapping for data persistence and initial database setup.
-```
-
-### 2. Start Demo Containers
-
-```bash
-# Start all containers including built-in MySQL for testing
-docker-compose up -d
-
-# Alternative: If using your own MySQL instance
-# Comment out mysql and mysql-init-data services in docker-compose.yml
-# Then use the custom configuration:
-# docker-compose -f docker-compose.custom-db.yml up -d
-```
-
-> **⏱️ Startup Time**: Initial container setup takes **2-3 minutes** to complete all initialization steps. This includes MySQL setup, automatic test data generation, and service dependencies.
-
-### 3. Access to OpenWebUI
-
-**🌐 Web Interface:** http://localhost:3004/
-
-> **⏳ Important**: Please wait **2-3 minutes** after running `docker-compose up -d` for all containers to fully initialize. OpenWebUI starts last to ensure all backend services (MySQL, test data generation, MCP server) are ready.
-
-**Quick Status Check:**
-```bash
-# Verify all containers are running
-docker-compose ps
-
-# If any container shows "starting" or "unhealthy", wait a bit longer
-# You can watch the startup logs:
-docker-compose logs -f
-```
 
 **Additional Resources:**
 - **MCP Tool Features (Swagger)**: http://localhost:8004/docs  
@@ -193,7 +107,7 @@ docker-compose up -d
 docker-compose ps
 
 # Watch the logs (Ctrl+C to exit)
-docker-compose logs -f mcp-server
+docker-compose logs -f mysql-init-data
 ```
 
 **⏱️ Container Startup Sequence & Wait Time:**
@@ -235,6 +149,22 @@ docker logs mcp-mysql-ops-mysql-init-data
 ```bash
 # Connect and verify test databases exist
 docker exec -it mcp-mysql-ops-mysql-8 mysql -u [your_mysql_user] -p -e "SHOW DATABASES;"
+```
+
+### 3. Access to OpenWebUI
+
+**🌐 Web Interface:** http://localhost:3004/
+
+> **⏳ Important**: Please wait **2-3 minutes** after running `docker-compose up -d` for all containers to fully initialize. OpenWebUI starts last to ensure all backend services (MySQL, test data generation, MCP server) are ready.
+
+**Quick Status Check:**
+```bash
+# Verify all containers are running
+docker-compose ps
+
+# If any container shows "starting" or "unhealthy", wait a bit longer
+# You can watch the startup logs:
+docker-compose logs -f
 ```
 
 ### 4. Registering the Tool in OpenWebUI
