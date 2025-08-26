@@ -121,12 +121,16 @@ cp .env.example .env
 
 **Default configuration (works out-of-the-box):**
 ```bash
-# Uses built-in MySQL container with automatic test data
+#### MySQL Root Configuration for Docker:
+MYSQL_ROOT_HOST=%
+MYSQL_ROOT_PASSWORD=changeme!@34
+
+#### MySQL Host Configuration:
 MYSQL_HOST=host.docker.internal
 MYSQL_PORT=13306
-MYSQL_USER=testuser          # Regular user with test DB permissions
-MYSQL_PASSWORD=testpass
-MYSQL_DATABASE=testdb        # Default connection DB
+MYSQL_USER=root
+MYSQL_PASSWORD=${MYSQL_PASSWORD}
+MYSQL_DATABASE=test_ecommerce
 ```
 
 **For your own MySQL server:**
@@ -157,12 +161,27 @@ docker-compose up -d
 # docker-compose -f docker-compose.custom-db.yml up -d
 ```
 
+> **⏱️ Startup Time**: Initial container setup takes **2-3 minutes** to complete all initialization steps. This includes MySQL setup, automatic test data generation, and service dependencies.
+
 ### 3. Access to OpenWebUI
 
-http://localhost:3004/
+**🌐 Web Interface:** http://localhost:3004/
 
-- The list of MCP tool features provided by `swagger` can be found in the MCPO API Docs URL.
-  - e.g: `http://localhost:8004/docs`
+> **⏳ Important**: Please wait **2-3 minutes** after running `docker-compose up -d` for all containers to fully initialize. OpenWebUI starts last to ensure all backend services (MySQL, test data generation, MCP server) are ready.
+
+**Quick Status Check:**
+```bash
+# Verify all containers are running
+docker-compose ps
+
+# If any container shows "starting" or "unhealthy", wait a bit longer
+# You can watch the startup logs:
+docker-compose logs -f
+```
+
+**Additional Resources:**
+- **MCP Tool Features (Swagger)**: http://localhost:8004/docs  
+- **MCPO Proxy API Documentation**: http://localhost:8004/mysql-ops/docs
 
 ### 2. Run Docker Stack
 
@@ -175,6 +194,22 @@ docker-compose ps
 
 # Watch the logs (Ctrl+C to exit)
 docker-compose logs -f mcp-server
+```
+
+**⏱️ Container Startup Sequence & Wait Time:**
+- **MySQL Container**: Starts first and initializes database (~30-60 seconds)
+- **MySQL Init Data**: Generates test data automatically (~1-2 minutes)
+- **MCP Server**: Starts after MySQL is ready (~10-20 seconds)
+- **OpenWebUI**: Starts last to ensure all services are available (~10-30 seconds)
+
+**💡 Please wait 2-3 minutes** for all containers to fully initialize before accessing the web interface. You can monitor the startup progress with:
+
+```bash
+# Monitor all container logs
+docker-compose logs -f
+
+# Check if all containers are healthy
+docker-compose ps
 ```
 
 ### 3. Automatic Test Data Generation
