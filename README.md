@@ -806,7 +806,7 @@ We're always excited to welcome new contributors! Whether you're fixing a typo, 
 
 > [MCPO Swagger URL] http://localhost:8004/mysql-ops/docs
 
-![MCPO Swagger APIs](img/screenshot-swagger-api.png)
+![MCPO Swagger APIs](img/screenshot-swagger-api-docs.png)
 
 ---
 
