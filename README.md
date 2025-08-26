@@ -42,7 +42,7 @@ You are working with the **MCP MySQL Operations Server**, a powerful tool that p
 
 ---
 
-![MCP-MySQL-Ops Usage Screenshot](img/screenshot-005.png)
+![MCP-MySQL-Ops Usage Screenshot](img/screenshot-001.png)
 
 ---
 

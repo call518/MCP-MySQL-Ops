@@ -438,10 +438,10 @@ async def get_table_schema_info(table_name: str, database_name: Optional[str] = 
         if not table_exists or table_exists[0]['count'] == 0:
             # Provide available tables in the database
             tables_query = """
-            SELECT table_name, table_type, engine, table_rows
+            SELECT TABLE_NAME as table_name, TABLE_TYPE as table_type, ENGINE, TABLE_ROWS as table_rows
             FROM information_schema.tables
             WHERE table_schema = %s AND table_type = 'BASE TABLE'
-            ORDER BY table_name
+            ORDER BY TABLE_NAME
             """
             available_tables = await execute_query(tables_query, [database_name], database=database_name)
             
@@ -1384,11 +1384,11 @@ async def get_current_database_info(database_name: Optional[str] = None) -> str:
         # Get storage engine distribution
         engines_query = """
         SELECT 
-            engine,
+            ENGINE,
             COUNT(*) as table_count
         FROM information_schema.tables
         WHERE table_schema = %s AND table_type = 'BASE TABLE'
-        GROUP BY engine
+        GROUP BY ENGINE
         ORDER BY table_count DESC
         """
         
@@ -1421,7 +1421,9 @@ async def get_current_database_info(database_name: Optional[str] = None) -> str:
         if engines_info:
             result.append("\n=== Storage Engines ===")
             for engine in engines_info:
-                result.append(f"{engine['engine']}: {engine['table_count']} tables")
+                engine_name = engine.get('ENGINE') or engine.get('engine', 'Unknown')
+                table_count = engine.get('table_count', 0)
+                result.append(f"{engine_name}: {table_count} tables")
         
         return "\n".join(result)
         
