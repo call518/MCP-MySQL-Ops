@@ -1,0 +1,100 @@
+services:
+  open-webui:
+    container_name: mcp-mysql-ops-open-webui
+    image: ghcr.io/open-webui/open-webui:main
+    depends_on:
+      mysql-init-data:
+        condition: service_completed_successfully
+    ports:
+      - "${DOCKER_EXTERNAL_PORT_OPENWEBUI}:8080"
+    environment:
+      - OLLAMA_BASE_URL=http://host.docker.internal:11434
+    volumes:
+      - open-webui-data:/app/backend/data
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
+
+  mcp-server:
+    container_name: mcp-mysql-ops-mcp-server
+    image: call518/mcp-server-mysql-ops:1.0.0
+    ports:
+      - "${DOCKER_EXTERNAL_PORT_MCP_SERVER}:8080" ### (WARNING) Must be same with port number of 'FASTMCP_PORT', 'mcp-config.json' and 'mcp-config.json.http'
+    environment:
+      - PYTHONPATH=${PYTHONPATH}
+      - FASTMCP_TYPE=${FASTMCP_TYPE}
+      - FASTMCP_HOST=${FASTMCP_HOST}
+      - FASTMCP_PORT=${FASTMCP_PORT}
+      - MYSQL_VERSION=${MYSQL_VERSION}
+      - MYSQL_HOST=${MYSQL_HOST}
+      - MYSQL_PORT=${MYSQL_PORT}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+    volumes:
+      - ./src:/app/src
+      - ./scripts:/app/scripts
+      - ./.env:/app/.env:ro
+    restart: unless-stopped
+
+  mcpo-proxy:
+    image: call518/mcpo-proxy-mysql-ops:1.0.0
+    container_name: mcp-mysql-ops-mcpo-proxy
+    depends_on:
+      - mcp-server
+    ports:
+      - "${DOCKER_EXTERNAL_PORT_MCPO_PROXY}:8000"
+    volumes:
+      - ./mcp-config.json.http:/app/config/mcp-config.json
+    restart: unless-stopped
+
+#------------------------------------------------------
+
+  mysql:
+    container_name: mcp-mysql-ops-mysql-${MYSQL_VERSION}
+    image: mysql:8
+    environment:
+      # for 'root' user
+      MYSQL_ROOT_HOST: '${MYSQL_ROOT_HOST}'
+      MYSQL_ROOT_PASSWORD: '${MYSQL_ROOT_PASSWORD}'
+      # for normal user
+      MYSQL_USER: testuser
+      MYSQL_PASSWORD: testpass
+      MYSQL_DATABASE: '${MYSQL_DATABASE}'
+    ports:
+      - '${MYSQL_PORT}:3306'
+    volumes:
+      - 'mysql-data:/var/lib/mysql'
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
+      start_period: 5s
+      interval: 10s
+      retries: 5
+    restart: unless-stopped
+
+  mysql-init-data:
+    container_name: mcp-mysql-ops-mysql-init-data
+    image: mysql:8
+    environment:
+      MYSQL_ROOT_HOST: '${MYSQL_ROOT_HOST}'
+      MYSQL_ROOT_PASSWORD: '${MYSQL_ROOT_PASSWORD}'
+      MYSQL_USER: '${MYSQL_USER}'
+      MYSQL_PASSWORD: '${MYSQL_PASSWORD}'
+      MYSQL_DATABASE: '${MYSQL_DATABASE}'
+    depends_on:
+      mysql:
+        condition: service_healthy
+    entrypoint: /bin/bash
+    command:
+      - "-c"
+      - |
+        /scripts/create-test-data.sh
+    volumes:
+      - ./scripts:/scripts:ro
+    restart: no
+
+volumes:
+  open-webui-data:
+    name: open-webui-data-mcp-mysql-ops
+  mysql-data:
+    name: mysql-data-mcp-mysql-ops

@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "mysql-ops": {
+      "type": "streamable-http",
+      "url": "http://host.docker.internal:18004/mcp"
+    }
+  }
+}

@@ -1,0 +1,17 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 🔒 Security Issues
+    url: https://github.com/call518/MCP-MySQL-Ops/security/advisories/new
+    about: Please report security vulnerabilities privately through GitHub Security Advisories
+  - name: 💬 GitHub Discussions
+    url: https://github.com/call518/MCP-MySQL-Ops/discussions
+    about: Ask questions, share usage examples, and discuss MySQL monitoring strategies with the community
+  - name: 📖 Documentation & Setup Guide
+    url: https://github.com/call518/MCP-MySQL-Ops#readme
+    about: Check the README for installation instructions, compatibility matrix, and comprehensive usage examples
+  - name: 🧪 MCP Inspector Testing
+    url: https://github.com/call518/MCP-MySQL-Ops#-quickstart-5-minutes
+    about: Use MCP Inspector for local testing and debugging of MySQL monitoring tools
+  - name: 🗂️ Tool Compatibility Matrix
+    url: https://github.com/call518/MCP-MySQL-Ops#tool-compatibility-matrix
+    about: Check MySQL version compatibility and Performance Schema requirements for specific monitoring tools
