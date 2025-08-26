@@ -5,7 +5,7 @@
 This is a **Model Context Protocol (MCP) server** built with **FastMCP** that provides MySQL database monitoring and operations through natural language queries. The server acts as a safe, read-only bridge between AI assistants and MySQL databases.
 
 ### Core Components
-- **`mcp_main.py`**: Main MCP server with 11+ `@mcp.tool()` decorated functions
+- **`mcp_main.py`**: Main MCP server with 19+ `@mcp.tool()` decorated functions
 - **`functions.py`**: Database connection layer using `aiomysql` with multi-database support
 - **`version_compat.py`**: MySQL 5.7+ and 8.0+ version detection and adaptive feature handling
 - **`prompt_template.md`**: Comprehensive prompt definitions loaded via `@mcp.prompt()` decorators
@@ -13,7 +13,7 @@ This is a **Model Context Protocol (MCP) server** built with **FastMCP** that pr
 
 ### Key Patterns
 
-**Multi-Database Architecture**: All tools accept optional `database_name` parameter to target specific databases while maintaining a default connection database from `MYSQL_DB` env var.
+**Multi-Database Architecture**: All tools accept optional `database_name` parameter to target specific databases while maintaining a default connection database from `MYSQL_DATABASE` env var.
 
 **Performance Schema Integration**: Core functionality leverages MySQL's Performance Schema and Information Schema. Tools automatically detect available features and adapt accordingly.
 
@@ -33,16 +33,13 @@ async def get_something(limit: int = 20, database_name: str = None) -> str:
         return f"Error: {str(e)}"
 ```
 
-**Version Compatibility Pattern**: Critical for MySQL 5.7 support - many tools use version-aware query builders:
+**Information Schema Column Casing**: Critical MySQL compatibility pattern - always use uppercase column names:
 ```python
-# In functions.py
-from .version_compat import get_mysql_version
+# Correct - MySQL returns uppercase column names
+SELECT ENGINE, TABLE_NAME FROM information_schema.tables
 
-async def get_database_size_data(database: str = None):
-    version = await get_mysql_version()
-    # Auto-adapts queries for MySQL 5.7 vs 8.0+ differences
-    query = build_version_compatible_query(version)
-    return await execute_query(query, database=database)
+# Handle both cases safely in code
+engine_name = result.get('ENGINE') or result.get('engine', 'Unknown')
 ```
 
 ## Development Workflows
@@ -67,7 +64,7 @@ docker-compose up -d
 
 ### Environment Configuration
 - Copy `.env.example` to `.env` and modify connection parameters
-- **Critical**: `MYSQL_DB` serves dual purpose - default connection target AND Docker database creation name
+- **Critical**: `MYSQL_DATABASE` serves dual purpose - default connection target AND Docker database creation name
 - Use `host.docker.internal` for `MYSQL_HOST` when connecting from containers to host MySQL
 
 ## Code Conventions
@@ -94,16 +91,16 @@ async def get_db_connection(database: str = None) -> aiomysql.Connection:
 
 ### Tool Compatibility Matrix
 When adding new tools, **must** update the compatibility matrix in `README.md`:
-- Classify as Core MySQL Monitoring Tools or Version-Enhanced Tools
+- Classify as Professional MySQL Tools (19 total) or Performance Schema Enhanced Tools
 - Document MySQL version support (5.7+/8.0+)
 - List Information Schema/Performance Schema tables used
 - Update tool count statistics
 
 ### Recent Major Changes
-- **MySQL Focus**: Completely migrated from MySQL to MySQL operations
-- **Comprehensive MySQL 5.7+/8.0+ Support**: All tools work on MySQL 5.7+ with enhanced 8.0+ features
-- **Performance Schema Integration**: Leveraging MySQL's built-in monitoring capabilities
-- **Enhanced Storage Analysis**: New tools for table sizes, index usage, and database capacity planning
+- **PostgreSQL-Style Init System**: Automatic test data generation using dedicated `mysql-init-data` container
+- **19 Professional Tools**: Expanded from 11 to 19 specialized monitoring tools
+- **Enhanced Docker Dependencies**: `service_completed_successfully` pattern for proper startup sequencing
+- **User Permission Management**: Root-to-user delegation system for secure test data access
 
 ## Project-Specific Integrations
 
@@ -119,6 +116,14 @@ The server loads prompts from `prompt_template.md` using a custom parsing system
 - **mcp-server**: Main MCP server container
 - **mcpo-proxy**: HTTP proxy for web-based MCP clients
 - **open-webui**: Web interface for testing
+
+**Container Startup Dependencies**: Uses `service_completed_successfully` pattern:
+```yaml
+# open-webui waits for test data generation to complete
+depends_on:
+  mysql-init-data:
+    condition: service_completed_successfully
+```
 
 ### Critical Dependencies
 ```python
@@ -173,7 +178,7 @@ Test tools with realistic prompts - never use function names directly:
 
 ## Common Pitfalls
 
-1. **Database Parameter Confusion**: `MYSQL_DB` is the default connection database, not a constraint on which databases can be accessed
+1. **Database Parameter Confusion**: `MYSQL_DATABASE` is the default connection database, not a constraint on which databases can be accessed
 2. **Performance Schema Assumptions**: Check Performance Schema availability before using enhanced monitoring tools
 3. **Port Misalignment**: `FASTMCP_PORT`, Docker external port, and MCP config files must all match
 4. **Environment Loading**: Use `scripts/run-mcp-inspector-local.sh` which properly loads `.env` - direct Python execution won't load environment
