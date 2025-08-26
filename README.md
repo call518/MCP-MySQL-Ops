@@ -302,11 +302,11 @@ Similar to the [MCP-PostgreSQL-Ops](https://github.com/call518/MCP-PostgreSQL-Op
 }
 ```
 
-"Show all active connections in a clear and readable html table format."
-![Claude Desktop Integration](img/screenshot-claude-desktop-airflow-connections-html.png)
+"Display MySQL server capabilities and version information."
+![Claude Desktop Integration](img/screenshot-claude-desktop-001.png)
 
-"Show all table sizes for test_ecommerce database as a summary."
-![Claude Desktop Integration](img/screenshot-claude-desktop-mermaid-diagram.png)
+"Draw relationships as a Mermaid diagram"
+![Claude Desktop Integration](img/screenshot-claude-desktop-002.png)
 
 (Optional) Run with Local Source:
 
