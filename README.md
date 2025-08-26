@@ -151,11 +151,11 @@ docker logs mcp-mysql-ops-mysql-init-data
 docker exec -it mcp-mysql-ops-mysql-8 mysql -u [your_mysql_user] -p -e "SHOW DATABASES;"
 ```
 
-### 3. Access to OpenWebUI
+### 4. Access to OpenWebUI
 
 **🌐 Web Interface:** http://localhost:3004/
 
-> **⏳ Important**: Please wait **2-3 minutes** after running `docker-compose up -d` for all containers to fully initialize. OpenWebUI starts last to ensure all backend services (MySQL, test data generation, MCP server) are ready.
+> **⏳ Important**: Please wait **1-2 minutes** after running `docker-compose up -d` for all containers to fully initialize. OpenWebUI starts last to ensure all backend services (MySQL, test data generation, MCP server) are ready.
 
 **Quick Status Check:**
 ```bash
@@ -167,14 +167,14 @@ docker-compose ps
 docker-compose logs -f
 ```
 
-### 4. Registering the Tool in OpenWebUI
+### 5. Registering the Tool in OpenWebUI
 
 1. logging in to OpenWebUI with an admin account
 1. go to "Settings" → "Tools" from the top menu.
 1. Enter the `mysql-ops` Tool address (e.g., `http://localhost:8004/mysql-ops`) to connect MCP Tools.
 1. Setup Ollama or OpenAI.
 
-### 5. Complete!
+### 6. Complete!
 
 **Congratulations!** Your MCP MySQL Operations server is now ready for use. You can start exploring your databases with natural language queries.
 
