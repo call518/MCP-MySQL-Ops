@@ -155,7 +155,7 @@ docker exec -it mcp-mysql-ops-mysql-8 mysql -u [your_mysql_user] -p -e "SHOW DAT
 
 **🌐 Web Interface:** http://localhost:3004/
 
-> **⏳ Important**: Please wait **1-2 minutes** after running `docker-compose up -d` for all containers to fully initialize. OpenWebUI starts last to ensure all backend services (MySQL, test data generation, MCP server) are ready.
+> **⏳ Important**: Please wait **2-3 minutes** after running `docker-compose up -d` for all containers to fully initialize. OpenWebUI starts last to ensure all backend services (MySQL, test data generation, MCP server) are ready.
 
 **Quick Status Check:**
 ```bash
