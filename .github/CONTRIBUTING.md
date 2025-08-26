@@ -37,7 +37,7 @@
 
 ## Ways to Contribute
 
-### � Using Issue Templates
+### 🔧 Using Issue Templates
 
 When you click "New Issue" on GitHub, you'll see a template selection page with these options:
 - **🐛 Bug Report** - Report bugs with detailed MySQL environment information
@@ -54,7 +54,7 @@ You'll also find quick links to:
 
 > **💡 Tip**: For security vulnerabilities related to database access or potential SQL injection, always use the Security Advisories feature instead of public issues.
 
-### �🐛 Bug Reports
+### 🐛 Bug Reports
 
 **Use the [Bug Report template](https://github.com/call518/MCP-MySQL-Ops/issues/new?template=bug_report.md)** to report issues.
 

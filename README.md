@@ -553,7 +553,7 @@ SET SESSION information_schema_stats_expiry = 0;
   - "Show database list with character sets and collation information."
   - "Display database storage usage and table counts."
   - 📋 **Features**: Database sizes, character sets, collations, table counts, storage usage
-  - � **MySQL 5.7+/8.0+**: Uses Information Schema for comprehensive database information
+  - 🔧 **MySQL 5.7+/8.0+**: Uses Information Schema for comprehensive database information
 
 - **get_table_list**
   - "List all tables in the test_ecommerce database."
