@@ -342,7 +342,7 @@ uvx --python 3.11 mcp-mysql-ops \
 uvx --python 3.11 mcp-mysql-ops
   --type streamable-http \
   --host 127.0.0.1 \
-  --port 8080 \
+  --port 8000 \
   --log-level DEBUG
 ```
 
@@ -390,7 +390,7 @@ PYTHONPATH=/path/to/MCP-MySQL-Ops
 python -m src.mcp_mysql_ops.mcp_main \
   --type streamable-http \
   --host 127.0.0.1 \
-  --port 8080 \
+  --port 8000 \
   --log-level DEBUG
 ```
 
@@ -404,7 +404,7 @@ python -m src.mcp_mysql_ops.mcp_main \
 | `MCP_LOG_LEVEL` | Server logging verbosity (DEBUG, INFO, WARNING, ERROR) | `INFO` | `INFO` |
 | `FASTMCP_TYPE` | MCP transport protocol (stdio for CLI, streamable-http for web) | `stdio` | `streamable-http` |
 | `FASTMCP_HOST` | HTTP server bind address (0.0.0.0 for all interfaces) | `127.0.0.1` | `0.0.0.0` |
-| `FASTMCP_PORT` | HTTP server port for MCP communication | `8080` | `8080` |
+| `FASTMCP_PORT` | HTTP server port for MCP communication | `8000` | `8000` |
 | `MYSQL_VERSION` | MySQL major version for Docker image selection | `8.0` | `8.0` |
 | `MYSQL_HOST` | MySQL server hostname or IP address | `127.0.0.1` | `host.docker.internal` |
 | `MYSQL_PORT` | MySQL server port number | `3306` | `13306` |
@@ -414,7 +414,7 @@ python -m src.mcp_mysql_ops.mcp_main \
 | `MYSQL_ROOT_HOST` | MySQL root host access pattern for Docker container | `%` | `%` |
 | `MYSQL_ROOT_PASSWORD` | MySQL root password for Docker container initialization | `changeme!@34` | `changeme!@34` |
 | `DOCKER_EXTERNAL_PORT_OPENWEBUI` | Host port mapping for Open WebUI container | `8080` | `3004` |
-| `DOCKER_EXTERNAL_PORT_MCP_SERVER` | Host port mapping for MCP server container | `8080` | `18004` |
+| `DOCKER_EXTERNAL_PORT_MCP_SERVER` | Host port mapping for MCP server container | `8000` | `18004` |
 | `DOCKER_EXTERNAL_PORT_MCPO_PROXY` | Host port mapping for MCPO proxy container | `8000` | `8004` |
 
 **Note**: `MYSQL_DATABASE` serves as the default target database for operations when no specific database is specified. In Docker environments, if set to a custom database name, this database will be automatically created during initial MySQL startup.

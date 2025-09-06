@@ -1436,7 +1436,7 @@ def main():
     """Main entry point for the MCP server."""
     parser = argparse.ArgumentParser(description="MCP MySQL Operations Server")
     parser.add_argument("--type", default="stdio", help="Transport type (stdio, streamable-http)")
-    parser.add_argument("--port", type=int, default=8080, help="Port to run the server on")
+    parser.add_argument("--port", type=int, default=8000, help="Port to run the server on (default: 8000)")
     parser.add_argument("--host", default="0.0.0.0", help="Host to run the server on") 
     parser.add_argument("--log-level", default="INFO", help="Logging level")
     
