@@ -10,7 +10,9 @@ echo "📁 Working directory: $(pwd)"
 # Load environment variables if .env exists
 if [ -f ".env" ]; then
     echo "📄 Loading environment from .env file"
-    export $(cat .env | grep -v '^#' | xargs)
+    set -o allexport
+    source .env
+    set +o allexport
 fi
 
 # Set default log level for development
@@ -21,4 +23,5 @@ echo "   Log Level: $MCP_LOG_LEVEL"
 echo "   MySQL Host: ${MYSQL_HOST:-localhost}:${MYSQL_PORT:-3306}"
 
 npx -y @modelcontextprotocol/inspector \
-  -- uv run python -m mcp_mysql_ops
+    -e PYTHONPATH='./src' \
+    -- uv run python -m mcp_mysql_ops
