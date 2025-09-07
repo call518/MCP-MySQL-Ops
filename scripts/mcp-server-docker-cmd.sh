@@ -26,4 +26,4 @@ echo "  MYSQL_USER: ${MYSQL_USER}"
 echo "  MYSQL_PASSWORD: ${MYSQL_PASSWORD}"
 echo "  MYSQL_DATABASE: ${MYSQL_DATABASE}"
 
-python -m src.mcp_mysql_ops.mcp_main --type ${FASTMCP_TYPE} --host ${FASTMCP_HOST} --port ${FASTMCP_PORT}
+python -m mcp_mysql_ops --type ${FASTMCP_TYPE} --host ${FASTMCP_HOST} --port ${FASTMCP_PORT}

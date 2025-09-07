@@ -21,4 +21,4 @@ echo "   Log Level: $MCP_LOG_LEVEL"
 echo "   MySQL Host: ${MYSQL_HOST:-localhost}:${MYSQL_PORT:-3306}"
 
 npx -y @modelcontextprotocol/inspector \
-  -- uv run python -m src.mcp_mysql_ops.mcp_main
+  -- uv run python -m mcp_mysql_ops

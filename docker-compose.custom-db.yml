@@ -17,17 +17,6 @@ services:
     image: call518/mcp-server-mysql-ops:1.0.0
     ports:
       - "${DOCKER_EXTERNAL_PORT_MCP_SERVER}:8000" ### (WARNING) Must be same with port number of 'FASTMCP_PORT', 'mcp-config.json' and 'mcp-config.json.http'
-    environment:
-      - PYTHONPATH=${PYTHONPATH}
-      - FASTMCP_TYPE=${FASTMCP_TYPE}
-      - FASTMCP_HOST=${FASTMCP_HOST}
-      - FASTMCP_PORT=${FASTMCP_PORT}
-      - MYSQL_VERSION=${MYSQL_VERSION}
-      - MYSQL_HOST=${MYSQL_HOST}
-      - MYSQL_PORT=${MYSQL_PORT}
-      - MYSQL_USER=${MYSQL_USER}
-      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
-      - MYSQL_DATABASE=${MYSQL_DATABASE}
     volumes:
       - ./src:/app/src
       - ./scripts:/app/scripts

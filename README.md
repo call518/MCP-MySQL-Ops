@@ -193,6 +193,38 @@ docker-compose logs -f
 
 ---
 
+## 🛠️ Local Development & Installation
+
+For developers wanting to run the MCP server locally or integrate it into their own projects:
+
+### Method 1: Console Script (Recommended)
+```bash
+# Clone and install
+git clone https://github.com/call518/MCP-MySQL-Ops.git
+cd MCP-MySQL-Ops
+pip install -e .
+
+# Run with simple command
+mcp-mysql-ops --type stdio
+mcp-mysql-ops --type streamable-http --host 127.0.0.1 --port 8000
+```
+
+### Method 2: Module Execution
+```bash
+# Clone and set PYTHONPATH
+git clone https://github.com/call518/MCP-MySQL-Ops.git
+cd MCP-MySQL-Ops
+export PYTHONPATH=$(pwd)/src
+
+# Run as module
+python -m mcp_mysql_ops --type stdio
+python -m mcp_mysql_ops --type streamable-http --host 127.0.0.1 --port 8000
+```
+
+> **💡 Pro Tip**: Use Method 1 (console script) for cleaner integration. Method 2 is useful when you need to modify the source code directly.
+
+---
+
 ## (NOTE) Sample Test Data Overview
 
 The test data generation system follows the PostgreSQL MCP project pattern - using a dedicated `mysql-init-data` container that automatically creates comprehensive test databases on first startup.
@@ -380,18 +412,14 @@ uvx --python 3.11 mcp-mysql-ops
 #### /w Local Source
 
 ```bash
-# Stdio mode
-PYTHONPATH=/path/to/MCP-MySQL-Ops
-python -m src.mcp_mysql_ops.mcp_main \
-  --type stdio
+# Method 1: Using installed console script (after pip install -e .)
+mcp-mysql-ops --type stdio
+mcp-mysql-ops --type streamable-http --host 127.0.0.1 --port 8000 --log-level DEBUG
 
-# HTTP mode
-PYTHONPATH=/path/to/MCP-MySQL-Ops
-python -m src.mcp_mysql_ops.mcp_main \
-  --type streamable-http \
-  --host 127.0.0.1 \
-  --port 8000 \
-  --log-level DEBUG
+# Method 2: Using module execution
+PYTHONPATH=/path/to/MCP-MySQL-Ops/src
+python -m mcp_mysql_ops --type stdio
+python -m mcp_mysql_ops --type streamable-http --host 127.0.0.1 --port 8000 --log-level DEBUG
 ```
 
 ---
@@ -754,8 +782,13 @@ Test tools with realistic prompts - never use function names directly:
 # Test with MCP Inspector
 ./scripts/run-mcp-inspector-local.sh
 
-# Direct execution for debugging
-python -m src.mcp_mysql_ops.mcp_main --log-level DEBUG
+# Direct execution methods for debugging
+# Method 1: Console script (after pip install -e .)
+pip install -e .
+mcp-mysql-ops --log-level DEBUG
+
+# Method 2: Module execution
+PYTHONPATH=src python -m mcp_mysql_ops --log-level DEBUG
 
 # Test with different MySQL versions
 # Modify MYSQL_HOST in .env to point to different MySQL instances
