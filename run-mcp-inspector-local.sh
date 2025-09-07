@@ -24,4 +24,5 @@ echo "   MySQL Host: ${MYSQL_HOST:-localhost}:${MYSQL_PORT:-3306}"
 
 npx -y @modelcontextprotocol/inspector \
     -e PYTHONPATH='./src' \
+    -e FASTMCP_TYPE='stdio' \
     -- uv run python -m mcp_mysql_ops
