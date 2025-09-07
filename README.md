@@ -193,7 +193,113 @@ docker-compose logs -f
 
 ---
 
-## 🛠️ Local Development & Installation
+## � Security & Authentication
+
+### Bearer Token Authentication
+
+For `streamable-http` mode, this MCP server supports Bearer token authentication to secure remote access. This is especially important when running the server in production environments.
+
+#### Configuration
+
+**Enable Authentication:**
+
+```bash
+# In .env file
+REMOTE_AUTH_ENABLE=true
+REMOTE_SECRET_KEY=your-secure-secret-key-here
+```
+
+**Or via CLI:**
+
+```bash
+python -m mcp_mysql_ops --type streamable-http --auth-enable --secret-key your-secure-secret-key-here
+```
+
+#### Security Levels
+
+1. **stdio mode** (Default): Local-only access, no authentication needed
+2. **streamable-http + REMOTE_AUTH_ENABLE=false**: Remote access without authentication ⚠️ **NOT RECOMMENDED for production**
+3. **streamable-http + REMOTE_AUTH_ENABLE=true**: Remote access with Bearer token authentication ✅ **RECOMMENDED for production**
+
+#### Client Configuration
+
+When authentication is enabled, MCP clients must include the Bearer token in the Authorization header:
+
+```json
+{
+  "mcpServers": {
+    "mysql-ops": {
+      "type": "streamable-http",
+      "url": "http://your-server:8000/mcp",
+      "headers": {
+        "Authorization": "Bearer your-secure-secret-key-here"
+      }
+    }
+  }
+}
+```
+
+#### Security Best Practices
+
+- **Always enable authentication** when using streamable-http mode in production
+- **Use strong, randomly generated secret keys** (32+ characters recommended)
+- **Use HTTPS** when possible (configure reverse proxy with SSL/TLS)
+- **Restrict network access** using firewalls or network policies
+- **Rotate secret keys regularly** for enhanced security
+- **Monitor access logs** for unauthorized access attempts
+
+#### Error Handling
+
+When authentication fails, the server returns:
+- **401 Unauthorized** for missing or invalid tokens
+- **Detailed error messages** in JSON format for debugging
+
+---
+
+## 🐛 Usage & Configuration
+
+This MCP server supports two connection modes: **stdio** (traditional) and **streamable-http** (Docker-based). You can configure the transport mode using CLI arguments or environment variables.
+
+**Configuration Priority:** CLI arguments > Environment variables > Default values
+
+### CLI Arguments
+
+- `--type` (`-t`): Transport type (`stdio` or `streamable-http`) - Default: `stdio`
+- `--host`: Host address for HTTP transport - Default: `127.0.0.1`  
+- `--port` (`-p`): Port number for HTTP transport - Default: `8000`
+- `--auth-enable`: Enable Bearer token authentication for streamable-http mode - Default: `false`
+- `--secret-key`: Secret key for Bearer token authentication (required when auth enabled)
+
+### Environment Variables
+
+| Variable | Description | Default | Project Default |
+|----------|-------------|---------|-----------------|
+| `PYTHONPATH` | Python module search path for MCP server imports | - | `/app/src` |
+| `MCP_LOG_LEVEL` | Server logging verbosity (DEBUG, INFO, WARNING, ERROR) | `INFO` | `INFO` |
+| `FASTMCP_TYPE` | MCP transport protocol (stdio for CLI, streamable-http for web) | `stdio` | `streamable-http` |
+| `FASTMCP_HOST` | HTTP server bind address (0.0.0.0 for all interfaces) | `127.0.0.1` | `0.0.0.0` |
+| `FASTMCP_PORT` | HTTP server port for MCP communication | `8000` | `8000` |
+| `REMOTE_AUTH_ENABLE` | Enable Bearer token authentication for streamable-http mode | `false` | `false` |
+| `REMOTE_SECRET_KEY` | Secret key for Bearer token authentication (required when auth enabled) | - | `your-secret-key-here` |
+| `MYSQL_HOST` | MySQL server hostname or IP address | `127.0.0.1` | `host.docker.internal` |
+| `MYSQL_PORT` | MySQL server port number | `3306` | `13306` |
+| `MYSQL_USER` | Username for MySQL server authentication | `root` | `root` |
+| `MYSQL_PASSWORD` | Password for MySQL server authentication | - | `changeme!@34` |
+| `MYSQL_DATABASE` | Name of the default target MySQL database | - | `test_ecommerce` |
+| `DOCKER_EXTERNAL_PORT_OPENWEBUI` | Host port mapping for Open WebUI container | `8080` | `3004` |
+
+### Environment Setup
+
+Copy `.env.example` to `.env` and configure your environment:
+
+```bash
+cp .env.example .env
+# Edit .env file with your specific configuration
+```
+
+---
+
+## �🛠️ Local Development & Installation
 
 For developers wanting to run the MCP server locally or integrate it into their own projects:
 
@@ -314,7 +420,8 @@ Similar to the [MCP-PostgreSQL-Ops](https://github.com/call518/MCP-PostgreSQL-Op
 ## Usage Examples
 
 ### Claude Desktop Integration
-(Recommended) Add to your Claude Desktop configuration file:
+
+**Method 1: Local MCP (transport="stdio")**
 
 ```json
 {
@@ -328,6 +435,37 @@ Similar to the [MCP-PostgreSQL-Ops](https://github.com/call518/MCP-PostgreSQL-Op
         "MYSQL_USER": "root",
         "MYSQL_PASSWORD": "changeme!@34",
         "MYSQL_DATABASE": "test_ecommerce"
+      }
+    }
+  }
+}
+```
+
+**Method 2: Remote MCP (transport="streamable-http")**
+
+**On MCP-Client Host:**
+
+```json
+{
+  "mcpServers": {
+    "mysql-ops": {
+      "type": "streamable-http",
+      "url": "http://localhost:18004/mcp"
+    }
+  }
+}
+```
+
+**With Bearer Token Authentication (Recommended for production):**
+
+```json
+{
+  "mcpServers": {
+    "mysql-ops": {
+      "type": "streamable-http", 
+      "url": "http://localhost:18004/mcp",
+      "headers": {
+        "Authorization": "Bearer your-secure-secret-key-here"
       }
     }
   }

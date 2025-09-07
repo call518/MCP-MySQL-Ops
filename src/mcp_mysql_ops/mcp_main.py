@@ -16,8 +16,9 @@ import argparse
 import logging
 import os
 import sys
-from typing import Any, Optional
+from typing import Any, Optional, List
 from fastmcp import FastMCP
+from fastmcp.server.auth import StaticTokenVerifier
 from .functions import (
     execute_query,
     execute_single_query,
@@ -55,9 +56,37 @@ logging.basicConfig(
 )
 
 # =============================================================================
+# Authentication Setup
+# =============================================================================
+
+# Check environment variables for authentication early
+_auth_enable = os.environ.get("REMOTE_AUTH_ENABLE", "false").lower() == "true"
+_secret_key = os.environ.get("REMOTE_SECRET_KEY", "")
+
+# Initialize the main MCP instance with authentication if configured
+if _auth_enable and _secret_key:
+    logger.info("Initializing MCP instance with Bearer token authentication (from environment)")
+    
+    # Create token configuration
+    tokens = {
+        _secret_key: {
+            "client_id": "mysql-ops-client",
+            "user": "admin",
+            "scopes": ["read", "write"],
+            "description": "MySQL Operations access token"
+        }
+    }
+    
+    auth = StaticTokenVerifier(tokens=tokens)
+    mcp = FastMCP("mcp-mysql-ops", auth=auth)
+    logger.info("MCP instance initialized with authentication")
+else:
+    logger.info("Initializing MCP instance without authentication")
+    mcp = FastMCP("mcp-mysql-ops")
+
+# =============================================================================
 # Server initialization
 # =============================================================================
-mcp = FastMCP("mcp-mysql-ops")
 
 # Prompt template path
 PROMPT_TEMPLATE_PATH = os.path.join(os.path.dirname(__file__), "prompt_template.md")
@@ -1432,24 +1461,105 @@ async def get_current_database_info(database_name: Optional[str] = None) -> str:
         return f"Error retrieving database info: {e}"
 
 
-def main():
-    """Main entry point for the MCP server."""
-    parser = argparse.ArgumentParser(description="MCP MySQL Operations Server")
-    parser.add_argument("--type", default="stdio", help="Transport type (stdio, streamable-http)")
-    parser.add_argument("--port", type=int, default=8000, help="Port to run the server on (default: 8000)")
-    parser.add_argument("--host", default="0.0.0.0", help="Host to run the server on") 
-    parser.add_argument("--log-level", default="INFO", help="Logging level")
+def main(argv: Optional[List[str]] = None):
+    """Entrypoint for MCP MySQL Operations server.
+
+    Supports optional CLI arguments (e.g. --log-level DEBUG) while remaining
+    backward-compatible with stdio launcher expectations.
+    """
+    global mcp
     
-    args = parser.parse_args()
+    parser = argparse.ArgumentParser(prog="mcp-mysql-ops", description="MCP MySQL Operations Server")
+    parser.add_argument(
+        "--log-level",
+        dest="log_level",
+        help="Logging level override (DEBUG, INFO, WARNING, ERROR, CRITICAL). Overrides MCP_LOG_LEVEL env if provided.",
+        choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
+    )
+    parser.add_argument(
+        "--type",
+        dest="transport_type",
+        help="Transport type (stdio or streamable-http). Default: stdio",
+        choices=["stdio", "streamable-http"],
+    )
+    parser.add_argument(
+        "--host",
+        dest="host",
+        help="Host address for streamable-http transport. Default: 127.0.0.1",
+    )
+    parser.add_argument(
+        "--port",
+        dest="port",
+        type=int,
+        help="Port number for streamable-http transport. Default: 8000",
+    )
+    parser.add_argument(
+        "--auth-enable",
+        dest="auth_enable",
+        action="store_true",
+        help="Enable Bearer token authentication for streamable-http mode. Default: False",
+    )
+    parser.add_argument(
+        "--secret-key",
+        dest="secret_key",
+        help="Secret key for Bearer token authentication. Required when auth is enabled.",
+    )
+    # Allow future extension without breaking unknown args usage
+    args = parser.parse_args(argv)
+
+    # Determine log level: CLI arg > environment variable > default
+    log_level = args.log_level or os.getenv("MCP_LOG_LEVEL", "INFO")
     
     # Set logging level
-    logging.getLogger().setLevel(getattr(logging, args.log_level.upper()))
+    logging.getLogger().setLevel(log_level)
+    logger.setLevel(log_level)
     
-    # Run the server with the specified transport type
-    if args.type == "streamable-http":
-        mcp.run(transport="streamable-http", host=args.host, port=args.port)
+    if args.log_level:
+        logger.info("Log level set via CLI to %s", args.log_level)
+    elif os.getenv("MCP_LOG_LEVEL"):
+        logger.info("Log level set via environment variable to %s", log_level)
     else:
-        # mcp.run()
+        logger.info("Using default log level: %s", log_level)
+
+    # 우선순위: 실행옵션 > 환경변수 > 기본값
+    # Transport type 결정
+    transport_type = args.transport_type or os.getenv("FASTMCP_TYPE", "stdio")
+    
+    # Host 결정
+    host = args.host or os.getenv("FASTMCP_HOST", "127.0.0.1")
+    
+    # Port 결정 (간결하게)
+    port = args.port or int(os.getenv("FASTMCP_PORT", 8000))
+    
+    # Authentication 설정 결정
+    auth_enable = args.auth_enable or os.getenv("REMOTE_AUTH_ENABLE", "false").lower() in ("true", "1", "yes", "on")
+    secret_key = args.secret_key or os.getenv("REMOTE_SECRET_KEY", "")
+    
+    # Validation for streamable-http mode with authentication
+    if transport_type == "streamable-http":
+        if auth_enable:
+            if not secret_key:
+                logger.error("ERROR: Authentication is enabled but no secret key provided.")
+                logger.error("Please set REMOTE_SECRET_KEY environment variable or use --secret-key argument.")
+                return
+            logger.info("Authentication enabled for streamable-http transport")
+        else:
+            logger.warning("WARNING: streamable-http mode without authentication enabled!")
+            logger.warning("This server will accept requests without Bearer token verification.")
+            logger.warning("Set REMOTE_AUTH_ENABLE=true and REMOTE_SECRET_KEY to enable authentication.")
+
+    # Note: MCP instance with authentication is already initialized at module level
+    # based on environment variables. CLI arguments will override if different.
+    if auth_enable != _auth_enable or secret_key != _secret_key:
+        logger.warning("CLI authentication settings differ from environment variables.")
+        logger.warning("Environment settings take precedence during module initialization.")
+
+    # Transport 모드에 따른 실행
+    if transport_type == "streamable-http":
+        logger.info(f"Starting streamable-http server on {host}:{port}")
+        mcp.run(transport="streamable-http", host=host, port=port)
+    else:
+        logger.info("Starting stdio transport for local usage")
         mcp.run(transport='stdio')
 
 

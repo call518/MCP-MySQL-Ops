@@ -2,7 +2,7 @@
   "mcpServers": {
     "mysql-ops": {
       "command": "python",
-      "args": ["-m", "mcp_mysql_ops.mcp_main"],
+      "args": ["-m", "mcp_mysql_ops"],
       "env": {
         "PYTHONPATH": "/app/src",
         "MYSQL_HOST": "host.docker.internal",
