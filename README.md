@@ -279,8 +279,8 @@ This MCP server supports two connection modes: **stdio** (traditional) and **str
 | `FASTMCP_TYPE` | MCP transport protocol (stdio for CLI, streamable-http for web) | `stdio` | `streamable-http` |
 | `FASTMCP_HOST` | HTTP server bind address (0.0.0.0 for all interfaces) | `127.0.0.1` | `0.0.0.0` |
 | `FASTMCP_PORT` | HTTP server port for MCP communication | `8000` | `8000` |
-| `REMOTE_AUTH_ENABLE` | Enable Bearer token authentication for streamable-http mode | `false` | `false` |
-| `REMOTE_SECRET_KEY` | Secret key for Bearer token authentication (required when auth enabled) | - | `your-secret-key-here` |
+| `REMOTE_AUTH_ENABLE` | Enable Bearer token authentication for streamable-http mode. **If undefined/empty, defaults to `false`**. Accepts: true/false, 1/0, yes/no, on/off (case insensitive) | `false` | `false` |
+| `REMOTE_SECRET_KEY` | Secret key for Bearer token authentication. **If undefined/empty, authentication will be disabled even if `REMOTE_AUTH_ENABLE=true`**. Recommended: 32+ character random string | `""` (empty) | `your-secret-key-here` |
 | `MYSQL_HOST` | MySQL server hostname or IP address | `127.0.0.1` | `host.docker.internal` |
 | `MYSQL_PORT` | MySQL server port number | `3306` | `13306` |
 | `MYSQL_USER` | Username for MySQL server authentication | `root` | `root` |
@@ -295,6 +295,31 @@ Copy `.env.example` to `.env` and configure your environment:
 ```bash
 cp .env.example .env
 # Edit .env file with your specific configuration
+```
+
+#### Environment Variable Defaults Policy
+
+**Authentication Variables:**
+- `REMOTE_AUTH_ENABLE`: If undefined, commented out, or empty → defaults to `false`
+- `REMOTE_SECRET_KEY`: If undefined, commented out, or empty → defaults to `""` (empty string)
+
+**Security Behavior:**
+- Authentication is **only enabled** when both conditions are met:
+  1. `REMOTE_AUTH_ENABLE` is explicitly set to a truthy value (true/1/yes/on)
+  2. `REMOTE_SECRET_KEY` is set to a non-empty string
+- If either condition fails, the server runs **without authentication**
+- This ensures safe defaults and prevents accidental authentication bypass
+
+**Example configurations:**
+```bash
+# Authentication disabled (all equivalent)
+# REMOTE_AUTH_ENABLE=            # undefined/commented
+REMOTE_AUTH_ENABLE=false         # explicit false
+REMOTE_AUTH_ENABLE=""           # empty string
+
+# Authentication enabled (requires both)
+REMOTE_AUTH_ENABLE=true         # or 1, yes, on
+REMOTE_SECRET_KEY=my-secret-key # non-empty string
 ```
 
 ---
