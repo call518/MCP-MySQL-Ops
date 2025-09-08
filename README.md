@@ -4,6 +4,7 @@
 [![Deploy to PyPI with tag](https://github.com/call518/MCP-MySQL-Ops/actions/workflows/pypi-publish.yml/badge.svg)](https://github.com/call518/MCP-MySQL-Ops/actions/workflows/pypi-publish.yml)
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/call518/MCP-MySQL-Ops)
 [![BuyMeACoffee](https://raw.githubusercontent.com/pachadotdev/buymeacoffee-badges/main/bmc-donate-yellow.svg)](https://www.buymeacoffee.com/call518)
+[![smithery badge](https://smithery.ai/badge/@call518/mcp-mysql-ops)](https://smithery.ai/server/@call518/mcp-mysql-ops)
 
 ## Overview
 
@@ -327,6 +328,14 @@ REMOTE_SECRET_KEY=my-secret-key # non-empty string
 ## �🛠️ Local Development & Installation
 
 For developers wanting to run the MCP server locally or integrate it into their own projects:
+
+### Installing via Smithery
+
+To install MCP-MySQL-Ops for Claude Desktop automatically via [Smithery](https://smithery.ai/server/@call518/mcp-mysql-ops):
+
+```bash
+npx -y @smithery/cli install @call518/mcp-mysql-ops --client claude
+```
 
 ### Method 1: Console Script (Recommended)
 ```bash
