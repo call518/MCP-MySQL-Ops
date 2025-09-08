@@ -52,6 +52,10 @@ You are working with the **MCP MySQL Operations Server**, a powerful tool that p
 > - Update the target MySQL connection information in your `.env` file (see MYSQL_HOST, MYSQL_PORT, MYSQL_USER, MYSQL_PASSWORD, MYSQL_DATABASE).
 > - In `docker-compose.yml`, comment out (disable) the `mysql` and `mysql-init-data` containers to avoid starting the built-in test database.
 
+### Flow Diagram of Quickstart/Tutorial
+
+![Flow Diagram of Quickstart/Tutorial](img/MCP-Workflow-of-Quickstart-Tutorial.png)
+
 ### 1. Environment Setup
 
 > **Note**: The system automatically handles user permissions - both root users and regular users are supported with appropriate access control.
@@ -193,7 +197,7 @@ docker-compose logs -f
 
 ---
 
-## � Security & Authentication
+## Security & Authentication
 
 ### Bearer Token Authentication
 
@@ -324,7 +328,7 @@ REMOTE_SECRET_KEY=my-secret-key # non-empty string
 
 ---
 
-## �🛠️ Local Development & Installation
+## 🛠️ Local Development & Installation
 
 For developers wanting to run the MCP server locally or integrate it into their own projects:
 
