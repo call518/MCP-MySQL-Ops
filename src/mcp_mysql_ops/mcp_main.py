@@ -1479,8 +1479,8 @@ def main(argv: Optional[List[str]] = None):
     parser.add_argument(
         "--type",
         dest="transport_type",
-        help="Transport type (stdio or streamable-http). Default: stdio",
-        choices=["stdio", "streamable-http"],
+        help="Transport type (stdio, streamable-http, or sse). Default: stdio",
+        choices=["stdio", "streamable-http", "sse"],
     )
     parser.add_argument(
         "--host",
@@ -1535,16 +1535,16 @@ def main(argv: Optional[List[str]] = None):
     auth_enable = args.auth_enable or os.getenv("REMOTE_AUTH_ENABLE", "false").lower() in ("true", "1", "yes", "on")
     secret_key = args.secret_key or os.getenv("REMOTE_SECRET_KEY", "")
     
-    # Validation for streamable-http mode with authentication
-    if transport_type == "streamable-http":
+    # Validation for streamable-http and sse modes with authentication
+    if transport_type in ["streamable-http", "sse"]:
         if auth_enable:
             if not secret_key:
                 logger.error("ERROR: Authentication is enabled but no secret key provided.")
                 logger.error("Please set REMOTE_SECRET_KEY environment variable or use --secret-key argument.")
                 return
-            logger.info("Authentication enabled for streamable-http transport")
+            logger.info(f"Authentication enabled for {transport_type} transport")
         else:
-            logger.warning("WARNING: streamable-http mode without authentication enabled!")
+            logger.warning(f"WARNING: {transport_type} mode without authentication enabled!")
             logger.warning("This server will accept requests without Bearer token verification.")
             logger.warning("Set REMOTE_AUTH_ENABLE=true and REMOTE_SECRET_KEY to enable authentication.")
 
@@ -1558,6 +1558,9 @@ def main(argv: Optional[List[str]] = None):
     if transport_type == "streamable-http":
         logger.info(f"Starting streamable-http server on {host}:{port}")
         mcp.run(transport="streamable-http", host=host, port=port)
+    elif transport_type == "sse":
+        logger.info(f"Starting SSE (Server-Sent Events) server on {host}:{port}")
+        mcp.run(transport="sse", host=host, port=port)
     else:
         logger.info("Starting stdio transport for local usage")
         mcp.run(transport='stdio')

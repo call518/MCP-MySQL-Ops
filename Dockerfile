@@ -13,4 +13,4 @@ RUN uv sync
 EXPOSE 8080
 
 # CMD ["python", "-m", "mcp_abmari_api.ambari_api"]
-CMD ["uv", "run", "src.mcp_mysql_ops", "--type", "stdio"]
+CMD ["uv", "run", "python", "-m", "src.mcp_mysql_ops", "--type", "stdio"]
