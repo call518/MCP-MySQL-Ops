@@ -1,0 +1,50 @@
+# Smithery configuration file: https://smithery.ai/docs/build/project-config
+
+startCommand:
+  type: stdio
+  configSchema:
+    # JSON Schema defining the configuration options for the MCP.
+    type: object
+    required:
+      - MYSQL_HOST
+      - MYSQL_PORT
+      - MYSQL_USER
+      - MYSQL_PASSWORD
+      - MYSQL_DATABASE
+      - MCP_LOG_LEVEL
+    properties:
+      MYSQL_HOST:
+        type: string
+        default: host.docker.internal
+      MYSQL_PORT:
+        type: string
+        default: "3306"
+      MYSQL_USER:
+        type: string
+        default: root
+      MCP_LOG_LEVEL:
+        type: string
+        default: INFO
+      MYSQL_DATABASE:
+        type: string
+        default: testdb
+      MYSQL_PASSWORD:
+        type: string
+        default: root
+  commandFunction:
+    # A JS function that produces the CLI command based on the given config to start the MCP on stdio.
+    |-
+    (config) => (
+      {
+        command: 'python',
+        args: ['src/server.py'],
+        env: {
+          MYSQL_HOST: config.mysqlHost,
+          MYSQL_PORT: config.mysqlPort,
+          MYSQL_USER: config.mysqlUser,
+          MYSQL_PASSWORD: config.mysqlPassword,
+          MYSQL_DATABASE: config.mysqlDatabase,
+          MCP_LOG_LEVEL: config.mcpLogLevel
+        }
+      }
+    )
