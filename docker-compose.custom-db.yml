@@ -21,6 +21,8 @@ services:
       - ./src:/app/src
       - ./scripts:/app/scripts
       - ./.env:/app/.env:ro
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     restart: unless-stopped
 
   mcpo-proxy:
@@ -32,6 +34,8 @@ services:
       - "${DOCKER_EXTERNAL_PORT_MCPO_PROXY}:8000"
     volumes:
       - ./mcp-config.json.http:/app/config/mcp-config.json
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     restart: unless-stopped
 
 volumes:
