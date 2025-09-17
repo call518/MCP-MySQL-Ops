@@ -31,8 +31,8 @@ services:
       test: ["CMD-SHELL", "nc -z localhost 8000 && sleep 5"]
       interval: 5s
       timeout: 10s
-      retries: 3
-      start_period: 20s
+      retries: 5
+      start_period: 10s
 
   mcpo-proxy:
     image: call518/mcpo-proxy-mysql-ops:1.0.0

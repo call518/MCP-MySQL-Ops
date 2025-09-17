@@ -6,7 +6,7 @@ WORKDIR /app
 
 # Install system dependencies including MySQL client libraries
 RUN dnf install -y epel-release \
-        && dnf install -y python${PYTHON_VERSION} python${PYTHON_VERSION}-pip git procps-ng lsof telnet screen iputils gcc python${PYTHON_VERSION}-devel libffi-devel openssl-devel \
+        && dnf install -y python${PYTHON_VERSION} python${PYTHON_VERSION}-pip git procps-ng lsof telnet screen iputils gcc python${PYTHON_VERSION}-devel libffi-devel openssl-devel nmap-ncat \
         && dnf install -y dnf-plugins-core \
         && dnf config-manager --set-enabled crb \
         && dnf clean all && dnf makecache \
