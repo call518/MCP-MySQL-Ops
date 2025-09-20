@@ -1,5 +1,6 @@
 services:
   open-webui:
+    env_file: .env
     container_name: mcp-mysql-ops-open-webui
     image: ghcr.io/open-webui/open-webui:main
     depends_on:
@@ -16,6 +17,7 @@ services:
     restart: unless-stopped
 
   mcp-server:
+    env_file: .env
     container_name: mcp-mysql-ops-mcp-server
     image: call518/mcp-server-mysql-ops:1.0.0
     ports:
@@ -35,6 +37,7 @@ services:
       start_period: 10s
 
   mcpo-proxy:
+    env_file: .env
     image: call518/mcpo-proxy-mysql-ops:1.0.0
     container_name: mcp-mysql-ops-mcpo-proxy
     depends_on:
@@ -51,6 +54,7 @@ services:
 #------------------------------------------------------
 
   mysql:
+    env_file: .env
     container_name: mcp-mysql-ops-mysql-${MYSQL_VERSION}
     image: mysql:8
     environment:
@@ -75,6 +79,7 @@ services:
     restart: unless-stopped
 
   mysql-init-data:
+    env_file: .env
     container_name: mcp-mysql-ops-mysql-init-data
     image: mysql:8
     environment:
