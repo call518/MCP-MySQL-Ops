@@ -19,6 +19,7 @@ import sys
 from typing import Any, Optional, List
 from fastmcp import FastMCP
 from fastmcp.server.auth import StaticTokenVerifier
+from smithery.decorators import smithery
 from .functions import (
     execute_query,
     execute_single_query,
@@ -34,7 +35,8 @@ from .functions import (
     parse_prompt_sections,
     get_prompt_template,
     get_current_database_name,
-    MYSQL_CONFIG
+    MYSQL_CONFIG,
+    refresh_mysql_config,
 )
 from .version_compat import (
     get_mysql_version,
@@ -1459,6 +1461,19 @@ async def get_current_database_info(database_name: Optional[str] = None) -> str:
     except Exception as e:
         logger.error(f"Failed to get current database info: {e}")
         return f"Error retrieving database info: {e}"
+
+
+@smithery.server()
+def create_server() -> FastMCP:
+    """Factory used by Smithery deployments to obtain the FastMCP server instance."""
+    refresh_mysql_config()
+    logger.info(
+        "Smithery create_server invoked with MySQL target %s:%s/%s",
+        MYSQL_CONFIG["host"],
+        MYSQL_CONFIG["port"],
+        MYSQL_CONFIG["db"],
+    )
+    return mcp
 
 
 def main(argv: Optional[List[str]] = None):

@@ -20,6 +20,19 @@ MYSQL_CONFIG = {
 }
 
 
+def refresh_mysql_config() -> None:
+    """Refresh cached MySQL connection details from the current environment."""
+    MYSQL_CONFIG.update(
+        {
+            "host": os.getenv("MYSQL_HOST", MYSQL_CONFIG["host"]),
+            "port": int(os.getenv("MYSQL_PORT", MYSQL_CONFIG["port"])),
+            "user": os.getenv("MYSQL_USER", MYSQL_CONFIG["user"]),
+            "password": os.getenv("MYSQL_PASSWORD", MYSQL_CONFIG["password"]),
+            "db": os.getenv("MYSQL_DATABASE", MYSQL_CONFIG["db"]),
+        }
+    )
+
+
 async def get_current_database_name(database: str = None) -> str:
     """Get the name of the currently connected database.
     
@@ -45,6 +58,7 @@ async def get_db_connection(database: str = None) -> aiomysql.Connection:
         database: Database name to connect to. If None, uses default from config.
     """
     try:
+        refresh_mysql_config()
         config = MYSQL_CONFIG.copy()
         if database:
             config["db"] = database
@@ -317,4 +331,3 @@ def get_prompt_template(section: str = None) -> str:
             return sections[i]
     
     return f"Section '{section}' not found in prompt template."
-
