@@ -1569,12 +1569,12 @@ def main(argv: Optional[List[str]] = None):
 def create_server() -> FastMCP:
     """Factory used by Smithery deployments to obtain the FastMCP server instance."""
     refresh_configs()
-    logger.info(
-        "Smithery create_server invoked with MySQL target %s:%s/%s",
-        MYSQL_CONFIG["host"],
-        MYSQL_CONFIG["port"],
-        MYSQL_CONFIG["db"],
-    )
+    # logger.info(
+    #     "Smithery create_server invoked with MySQL target %s:%s/%s",
+    #     MYSQL_CONFIG["host"],
+    #     MYSQL_CONFIG["port"],
+    #     MYSQL_CONFIG["db"],
+    # )
     return mcp
 
 
