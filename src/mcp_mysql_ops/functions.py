@@ -20,7 +20,7 @@ MYSQL_CONFIG = {
 }
 
 
-def refresh_mysql_config() -> None:
+def refresh_configs() -> None:
     """Refresh cached MySQL connection details from the current environment."""
     MYSQL_CONFIG.update(
         {
@@ -58,7 +58,7 @@ async def get_db_connection(database: str = None) -> aiomysql.Connection:
         database: Database name to connect to. If None, uses default from config.
     """
     try:
-        refresh_mysql_config()
+        refresh_configs()
         config = MYSQL_CONFIG.copy()
         if database:
             config["db"] = database

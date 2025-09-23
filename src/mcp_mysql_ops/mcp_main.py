@@ -36,7 +36,7 @@ from .functions import (
     get_prompt_template,
     get_current_database_name,
     MYSQL_CONFIG,
-    refresh_mysql_config,
+    refresh_configs,
 )
 from .version_compat import (
     get_mysql_version,
@@ -1463,19 +1463,6 @@ async def get_current_database_info(database_name: Optional[str] = None) -> str:
         return f"Error retrieving database info: {e}"
 
 
-@smithery.server()
-def create_server() -> FastMCP:
-    """Factory used by Smithery deployments to obtain the FastMCP server instance."""
-    refresh_mysql_config()
-    logger.info(
-        "Smithery create_server invoked with MySQL target %s:%s/%s",
-        MYSQL_CONFIG["host"],
-        MYSQL_CONFIG["port"],
-        MYSQL_CONFIG["db"],
-    )
-    return mcp
-
-
 def main(argv: Optional[List[str]] = None):
     """Entrypoint for MCP MySQL Operations server.
 
@@ -1576,6 +1563,19 @@ def main(argv: Optional[List[str]] = None):
     else:
         logger.info("Starting stdio transport for local usage")
         mcp.run(transport='stdio')
+
+
+@smithery.server()
+def create_server() -> FastMCP:
+    """Factory used by Smithery deployments to obtain the FastMCP server instance."""
+    refresh_configs()
+    logger.info(
+        "Smithery create_server invoked with MySQL target %s:%s/%s",
+        MYSQL_CONFIG["host"],
+        MYSQL_CONFIG["port"],
+        MYSQL_CONFIG["db"],
+    )
+    return mcp
 
 
 if __name__ == "__main__":
