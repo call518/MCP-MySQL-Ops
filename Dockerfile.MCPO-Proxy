@@ -1,6 +1,6 @@
 FROM rockylinux:9.3
 
-ARG PYTHON_VERSION=3.11
+ARG PYTHON_VERSION=3.12
 
 RUN mkdir -p /app/config
 

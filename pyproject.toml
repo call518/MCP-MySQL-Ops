@@ -3,12 +3,12 @@ name = "mcp-mysql-ops"
 version = "0.0.0"
 description = "MCP server for MySQL database operations and monitoring"
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.12"
 authors = [{ name = "JungJungIn", email = "call518@gmail.com" }]
 dependencies = [
-    "fastmcp>=2.11.1",
+    "fastmcp>=2.11.3",
     "aiomysql>=0.2.0",
-    "PyMySQL>=1.1.0"
+    "PyMySQL>=1.1.2"
 ]
 
 [project.optional-dependencies]

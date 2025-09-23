@@ -464,7 +464,7 @@ Similar to the [MCP-PostgreSQL-Ops](https://github.com/call518/MCP-PostgreSQL-Op
   "mcpServers": {
     "mysql-ops": {
       "command": "uvx",
-      "args": ["--python", "3.11", "mcp-mysql-ops"],
+      "args": ["--python", "3.12", "mcp-mysql-ops"],
       "env": {
         "MYSQL_HOST": "127.0.0.1",
         "MYSQL_PORT": "13306",
@@ -541,11 +541,11 @@ Similar to the [MCP-PostgreSQL-Ops](https://github.com/call518/MCP-PostgreSQL-Op
 
 ```bash
 # Stdio mode
-uvx --python 3.11 mcp-mysql-ops \
+uvx --python 3.12 mcp-mysql-ops \
   --type stdio
 
 # HTTP mode
-uvx --python 3.11 mcp-mysql-ops
+uvx --python 3.12 mcp-mysql-ops
   --type streamable-http \
   --host 127.0.0.1 \
   --port 8000 \
@@ -559,7 +559,7 @@ uvx --python 3.11 mcp-mysql-ops
   "mcpServers": {
     "MySQL-A": {
       "command": "uvx",
-      "args": ["--python", "3.11", "mcp-mysql-ops"],
+      "args": ["--python", "3.12", "mcp-mysql-ops"],
       "env": {
         "MYSQL_HOST": "a.foo.com",
         "MYSQL_PORT": "3306",
@@ -570,7 +570,7 @@ uvx --python 3.11 mcp-mysql-ops
     },
     "MySQL-B": {
       "command": "uvx",
-      "args": ["--python", "3.11", "mcp-mysql-ops"],
+      "args": ["--python", "3.12", "mcp-mysql-ops"],
       "env": {
         "MYSQL_HOST": "b.bar.com",
         "MYSQL_PORT": "3306",
@@ -633,7 +633,7 @@ python -m mcp_mysql_ops --type streamable-http --host 127.0.0.1 --port 8000 --lo
 
 ### Minimum Requirements
 - MySQL 5.7+ or MySQL 8.0+ (tested with MySQL 8.0.37)
-- Python 3.11+
+- Python 3.12+
 - Network access to MySQL server
 - Read permissions on system databases (`information_schema`, `performance_schema`)
 
@@ -1019,6 +1019,15 @@ We're always excited to welcome new contributors! Whether you're fixing a typo, 
 
 ## License
 Freely use, modify, and distribute under the **MIT License**.
+
+---
+
+## Compatibility
+
+- **MySQL 5.7+ / 8.0+** (MySQL 8.0+ recommended for enhanced features)
+- **Python 3.12+** (Python 3.12 recommended for optimal performance)
+- **Compatible with AWS RDS, Aurora MySQL, and self-managed MySQL instances**
+- **Works with Claude Desktop, OpenWebUI, and other MCP clients**
 
 ---
 

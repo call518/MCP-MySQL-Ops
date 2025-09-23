@@ -6,10 +6,9 @@
 
 ### Prerequisites
 
-- MySQL 5.7+ or 8.0+ (for testing)
-- Python 3.11+
-- UV package manager
-- Git
+- MySQL 5.7+ or MySQL 8.0+ (tested with MySQL 8.0.37)
+- Python 3.12+
+- Docker and Docker Compose (for testing)
 
 ### Development Setup
 
