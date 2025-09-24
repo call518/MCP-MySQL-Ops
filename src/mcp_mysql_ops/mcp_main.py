@@ -1565,6 +1565,7 @@ def main(argv: Optional[List[str]] = None):
         mcp.run(transport='stdio')
 
 
+### Smithery Server Integration ###
 @smithery.server()
 def create_server() -> FastMCP:
     """Factory used by Smithery deployments to obtain the FastMCP server instance."""
