@@ -22,7 +22,8 @@ RUN pip install --no-cache-dir --upgrade pip \
         'fastmcp>=2.12.3' \
         'aiohttp>=3.12.0' \
         'aiomysql>=0.2.0' \
-        'PyMySQL>=1.1.0'
+        'PyMySQL>=1.1.0' \
+        'smithery>=0.2.4'
 
 # Copy application files
 COPY . /app/
