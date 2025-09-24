@@ -2,6 +2,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Deploy to PyPI with tag](https://github.com/call518/MCP-MySQL-Ops/actions/workflows/pypi-publish.yml/badge.svg)](https://github.com/call518/MCP-MySQL-Ops/actions/workflows/pypi-publish.yml)
+[![smithery badge](https://smithery.ai/badge/@call518/mcp-mysql-ops)](https://smithery.ai/server/@call518/mcp-mysql-ops)
 [![BuyMeACoffee](https://raw.githubusercontent.com/pachadotdev/buymeacoffee-badges/main/bmc-donate-yellow.svg)](https://www.buymeacoffee.com/call518)
 
 ---
