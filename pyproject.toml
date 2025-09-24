@@ -10,7 +10,6 @@ dependencies = [
     "aiomysql>=0.2.0",
     "PyMySQL>=1.1.0",
     "mcp>=1.13.0",
-    "smithery>=0.2.4"
 ]
 
 [project.optional-dependencies]
@@ -21,8 +20,6 @@ dev = [
 
 [project.scripts]
 mcp-mysql-ops = "mcp_mysql_ops.mcp_main:main"
-dev = "smithery.cli.dev:main"
-playground = "smithery.cli.playground:main"
 
 [build-system]
 requires = ["setuptools>=61.0", "wheel"]
@@ -34,5 +31,3 @@ where = ["src"]
 [tool.setuptools.package-dir]
 "" = "src"
 
-[tool.smithery] 
-server = "mcp_mysql_ops.mcp_main:create_server"

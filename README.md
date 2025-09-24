@@ -198,21 +198,6 @@ docker-compose logs -f
 - **"Show me database size information"**
 - **"What tables have the most rows?"**
 
-#### 📖 **Next Steps:**
-
-## Smithery Deployment
-
-Follow these steps to publish the MCP server on [smithery.ai](https://smithery.ai/):
-
-1. Install dependencies with `uv sync` (or your preferred manager) so the `smithery` CLI is available locally.
-2. Verify the server using the bundled scripts: run `uv run playground` for the interactive playground or `uv run dev` for a direct server launch.
-3. Set the required MySQL environment variables (`MYSQL_HOST`, `MYSQL_PORT`, `MYSQL_USER`, `MYSQL_PASSWORD`, `MYSQL_DATABASE`) in the Smithery dashboard. These values are read automatically when the deployment starts.
-4. Push the repository with the updated `pyproject.toml`, `smithery.yaml`, and `@smithery.server` factory (`src/mcp_mysql_ops/mcp_main.py:create_server`).
-5. Trigger a deployment from the Smithery console; Smithery will build the project with `uv`, load the server via the `tool.smithery` entry point, and expose the HTTP endpoint at `/mcp`.
-- Browse the **[Example Queries section](#usage-examples)** below for more query examples
-- Check out **[Tool Usage Examples with Screenshots](https://github.com/call518/MCP-MySQL-Ops/wiki/Tool-Usage-Example)** for visual guides
-- Explore the **[Tool Compatibility Matrix](#tool-compatibility-matrix)** to understand available features
-
 ---
 
 ## Security & Authentication

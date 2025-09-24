@@ -16,10 +16,9 @@ import argparse
 import logging
 import os
 import sys
-from typing import Any, Dict, Optional, List
+from typing import Any, Optional, List
 from fastmcp import FastMCP
 from fastmcp.server.auth import StaticTokenVerifier
-from smithery.decorators import smithery
 from .functions import (
     execute_query,
     execute_single_query,
@@ -61,15 +60,7 @@ logging.basicConfig(
 # Authentication Setup
 # =============================================================================
 
-# =============================================================================
-# Smithery configuration schema
-# =============================================================================
-
-def _bool_to_env(value: bool) -> str:
-    return "true" if value else "false"
-
-
-# Check environment variables for authentication early (may be overridden by Smithery config later)
+# Check environment variables for authentication early
 _auth_enable = os.environ.get("REMOTE_AUTH_ENABLE", "false").lower() == "true"
 _secret_key = os.environ.get("REMOTE_SECRET_KEY", "")
 
@@ -1571,88 +1562,6 @@ def main(argv: Optional[List[str]] = None):
     else:
         logger.info("Starting stdio transport for local usage")
         mcp.run(transport='stdio')
-
-
-### Smithery Server Integration ###
-SMITHERY_CONFIG_SCHEMA: Dict[str, Any] = {
-    "type": "object",
-    "title": "MCP MySQL Ops Configuration",
-    "required": [
-        "MYSQL_HOST",
-        "MYSQL_PORT",
-        "MYSQL_USER",
-        "MYSQL_PASSWORD",
-        "MYSQL_DATABASE",
-    ],
-    "properties": {
-        "MYSQL_HOST": {
-            "type": "string",
-            "title": "MySQL Host",
-            "default": "localhost",
-            "description": "Hostname or IP address of the MySQL server.",
-        },
-        "MYSQL_PORT": {
-            "type": "integer",
-            "title": "MySQL Port",
-            "default": 3306,
-            "description": "Port number used to connect to MySQL.",
-            "minimum": 1,
-            "maximum": 65535,
-        },
-        "MYSQL_USER": {
-            "type": "string",
-            "title": "MySQL User",
-            "default": "root",
-            "description": "Username for authenticating with MySQL.",
-        },
-        "MYSQL_PASSWORD": {
-            "type": "string",
-            "title": "MySQL Password",
-            "default": "",
-            "description": "Password for the MySQL user.",
-            "secret": True,
-        },
-        "MYSQL_DATABASE": {
-            "type": "string",
-            "title": "Default Database",
-            "default": "mysql",
-            "description": "Database name used for initial connections.",
-        }
-    }
-}
-
-def _apply_smithery_config(config: Optional[Dict[str, Any]]) -> None:
-    """Update environment variables and cached settings from Smithery config."""
-    if not config:
-        return
-
-    env_updates: Dict[str, str] = {}
-    for key, raw_value in config.items():
-        if raw_value is None:
-            continue
-        if isinstance(raw_value, bool):
-            env_updates[key] = _bool_to_env(raw_value)
-        else:
-            env_updates[key] = str(raw_value)
-
-    if not env_updates:
-        return
-
-    os.environ.update(env_updates)
-
-@smithery.server(config_schema=SMITHERY_CONFIG_SCHEMA)
-def create_server(config: Optional[Dict[str, Any]] = None) -> FastMCP:
-    """Factory used by Smithery deployments to obtain the FastMCP server instance."""
-    _apply_smithery_config(config)
-    refresh_configs()
-
-    # logger.info(
-    #     "Smithery create_server invoked with MySQL target %s:%s/%s",
-    #     MYSQL_CONFIG["host"],
-    #     MYSQL_CONFIG["port"],
-    #     MYSQL_CONFIG["db"],
-    # )
-    return mcp
 
 
 if __name__ == "__main__":
