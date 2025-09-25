@@ -950,6 +950,101 @@ Test tools with realistic prompts - never use function names directly:
 
 ---
 
+## 🚀 Adding Custom Tools
+
+This MCP server is designed for easy extensibility. Follow these 4 simple steps to add your own custom tools:
+
+### Step-by-Step Guide
+
+#### 1. **Add Helper Functions (Optional)**
+
+Add reusable data functions to `src/<package_name>/functions.py`:
+
+```python
+async def get_your_custom_data(target_resource: str = None) -> List[Dict[str, Any]]:
+    """Your custom data retrieval function."""
+    # Example implementation - adapt to your service
+    data_source = await get_data_connection(target_resource)
+    results = await fetch_data_from_source(
+        source=data_source,
+        filters=your_conditions,
+        aggregations=["count", "sum", "avg"],
+        sorting=["count DESC", "timestamp ASC"]
+    )
+    return results
+```
+
+#### 2. **Create Your MCP Tool**
+
+Add your tool function to `src/<package_name>/mcp_main.py`:
+
+```python
+@mcp.tool()
+async def get_your_custom_analysis(limit: int = 50, target_name: Optional[str] = None) -> str:
+    """
+    [Tool Purpose]: Brief description of what your tool does
+    
+    [Exact Functionality]:
+    - Feature 1: Data aggregation and analysis
+    - Feature 2: Resource monitoring and insights
+    - Feature 3: Performance metrics and reporting
+    
+    [Required Use Cases]:
+    - When user asks "your specific analysis request"
+    - Your business-specific monitoring needs
+    
+    Args:
+        limit: Maximum results (1-100)
+        target_name: Target resource/service name
+    
+    Returns:
+        Formatted analysis results
+    """
+    try:
+        limit = max(1, min(limit, 100))  # Always validate input
+        
+        results = await get_your_custom_data(target_resource=target_name)
+        
+        if results:
+            results = results[:limit]
+        
+        return format_table_data(results, f"Custom Analysis (Top {len(results)})")
+        
+    except Exception as e:
+        logger.error(f"Failed to get custom analysis: {e}")
+        return f"Error: {str(e)}"
+```
+
+#### 3. **Update Imports (If Needed)**
+
+Add your helper function to imports in `src/<package_name>/mcp_main.py`:
+
+```python
+from .functions import (
+    # ...existing imports...
+    get_your_custom_data,  # Add your new function
+)
+```
+
+#### 4. **Test Your Tool**
+
+```bash
+# Local testing
+./scripts/run-mcp-inspector-local.sh
+
+# Or with Docker
+docker-compose up -d
+docker-compose logs -f mcp-server
+
+# Test with natural language:
+# "Show me your custom analysis"
+# "Get custom analysis for target_name"
+```
+
+That's it! Your custom tool is ready to use with natural language queries.
+
+---
+
 ## Development
 
 ### Testing & Development
