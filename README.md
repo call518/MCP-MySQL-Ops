@@ -952,7 +952,7 @@ Test tools with realistic prompts - never use function names directly:
 
 ## 🚀 Adding Custom Tools
 
-This MCP server is designed for easy extensibility. Follow these 4 simple steps to add your own custom tools:
+This MCP server is designed for easy extensibility. Follow these 5 simple steps to add your own custom tools:
 
 ### Step-by-Step Guide
 
@@ -1026,7 +1026,21 @@ from .functions import (
 )
 ```
 
-#### 4. **Test Your Tool**
+#### 4. **Update Prompt Template (Recommended)**
+
+Add your tool description to `src/<package_name>/prompt_template.md` for better natural language recognition:
+
+```markdown
+### **Your Custom Analysis Tool**
+
+### X. **get_your_custom_analysis**
+**Purpose**: Brief description of what your tool does
+**Usage**: "Show me your custom analysis" or "Get custom analysis for database_name"
+**Features**: Data aggregation, resource monitoring, performance metrics
+**Required**: `target_name` parameter for specific resource analysis
+```
+
+#### 5. **Test Your Tool**
 
 ```bash
 # Local testing
