@@ -1,6 +1,6 @@
 {
   "mcpServers": {
-    "mysql-ops": {
+    "mcp-mysql-ops": {
       "command": "python",
       "args": ["-m", "mcp_mysql_ops"],
       "env": {

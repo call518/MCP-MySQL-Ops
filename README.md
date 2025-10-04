@@ -241,7 +241,7 @@ When authentication is enabled, MCP clients must include the Bearer token in the
 ```json
 {
   "mcpServers": {
-    "mysql-ops": {
+    "mcp-mysql-ops": {
       "type": "streamable-http",
       "url": "http://your-server:8000/mcp",
       "headers": {
@@ -464,7 +464,7 @@ Similar to the [MCP-PostgreSQL-Ops](https://github.com/call518/MCP-PostgreSQL-Op
 ```json
 {
   "mcpServers": {
-    "mysql-ops": {
+    "mcp-mysql-ops": {
       "command": "uvx",
       "args": ["--python", "3.11", "mcp-mysql-ops"],
       "env": {
@@ -486,7 +486,7 @@ Similar to the [MCP-PostgreSQL-Ops](https://github.com/call518/MCP-PostgreSQL-Op
 ```json
 {
   "mcpServers": {
-    "mysql-ops": {
+    "mcp-mysql-ops": {
       "type": "streamable-http",
       "url": "http://localhost:18004/mcp"
     }
@@ -499,7 +499,7 @@ Similar to the [MCP-PostgreSQL-Ops](https://github.com/call518/MCP-PostgreSQL-Op
 ```json
 {
   "mcpServers": {
-    "mysql-ops": {
+    "mcp-mysql-ops": {
       "type": "streamable-http", 
       "url": "http://localhost:18004/mcp",
       "headers": {
@@ -521,7 +521,7 @@ Similar to the [MCP-PostgreSQL-Ops](https://github.com/call518/MCP-PostgreSQL-Op
 ```json
 {
   "mcpServers": {
-    "mysql-ops": {
+    "mcp-mysql-ops": {
       "command": "uv",
       "args": ["run", "python", "-m", "src.mcp_mysql_ops.mcp_main"],
       "env": {
