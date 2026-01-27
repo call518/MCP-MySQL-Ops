@@ -187,6 +187,8 @@ docker-compose logs -f
 
 ### 5. Registering the Tool in OpenWebUI
 
+> 📌 **Note**: Web-UI configuration instructions are based on OpenWebUI **v0.6.22**. Menu locations and settings may differ in newer versions.
+
 1. logging in to OpenWebUI with an admin account
 1. go to "Settings" → "Tools" from the top menu.
 1. Enter the `mysql-ops` Tool address (e.g., `http://localhost:8004/mysql-ops`) to connect MCP Tools.

@@ -3,7 +3,8 @@ services:
     env_file: .env
     container_name: mcp-mysql-ops-open-webui
     # image: ghcr.io/open-webui/open-webui:main
-    image: ghcr.io/open-webui/open-webui:0.6.22
+    # image: ghcr.io/open-webui/open-webui:0.6.22
+    image: ghcr.io/open-webui/open-webui:0.7.2
     depends_on:
       mysql-init-data:
         condition: service_completed_successfully
