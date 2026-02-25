@@ -60,30 +60,27 @@ logging.basicConfig(
 # Authentication Setup
 # =============================================================================
 
-# Check environment variables for authentication early
-_auth_enable = os.environ.get("REMOTE_AUTH_ENABLE", "false").lower() == "true"
-_secret_key = os.environ.get("REMOTE_SECRET_KEY", "")
+TRUTHY_VALUES = ("true", "1", "yes", "on")
 
-# Initialize the main MCP instance with authentication if configured
-if _auth_enable and _secret_key:
-    logger.info("Initializing MCP instance with Bearer token authentication (from environment)")
-    
-    # Create token configuration
+
+def _parse_bool_env(value: str) -> bool:
+    return value.strip().lower() in TRUTHY_VALUES
+
+
+def _build_static_token_auth(secret_key: str) -> StaticTokenVerifier:
     tokens = {
-        _secret_key: {
+        secret_key: {
             "client_id": "mysql-ops-client",
-            "user": "admin",
             "scopes": ["read", "write"],
-            "description": "MySQL Operations access token"
         }
     }
-    
-    auth = StaticTokenVerifier(tokens=tokens)
-    mcp = FastMCP("mcp-mysql-ops", auth=auth)
-    logger.info("MCP instance initialized with authentication")
-else:
-    logger.info("Initializing MCP instance without authentication")
-    mcp = FastMCP("mcp-mysql-ops")
+    return StaticTokenVerifier(tokens=tokens)
+
+
+# Initialize MCP instance once for decorator registration.
+# Runtime authentication is configured in main() before mcp.run().
+logger.info("Initializing MCP instance")
+mcp = FastMCP("mcp-mysql-ops")
 
 # =============================================================================
 # Server initialization
@@ -1480,8 +1477,9 @@ def main(argv: Optional[List[str]] = None):
     parser.add_argument(
         "--type",
         dest="transport_type",
-        help="Transport type (stdio or streamable-http). Default: stdio",
+        help="Transport type. Default: env FASTMCP_TYPE or stdio",
         choices=["stdio", "streamable-http"],
+        default=None,
     )
     parser.add_argument(
         "--host",
@@ -1494,11 +1492,20 @@ def main(argv: Optional[List[str]] = None):
         type=int,
         help="Port number for streamable-http transport. Default: 8000",
     )
-    parser.add_argument(
+    auth_group = parser.add_mutually_exclusive_group()
+    auth_group.add_argument(
         "--auth-enable",
         dest="auth_enable",
         action="store_true",
-        help="Enable Bearer token authentication for streamable-http mode. Default: False",
+        default=None,
+        help="Enable Bearer token authentication for streamable-http mode.",
+    )
+    auth_group.add_argument(
+        "--auth-disable",
+        dest="auth_enable",
+        action="store_false",
+        default=None,
+        help="Disable Bearer token authentication for streamable-http mode.",
     )
     parser.add_argument(
         "--secret-key",
@@ -1533,7 +1540,10 @@ def main(argv: Optional[List[str]] = None):
     port = args.port or int(os.getenv("FASTMCP_PORT", 8000))
     
     # Authentication 설정 결정
-    auth_enable = args.auth_enable or os.getenv("REMOTE_AUTH_ENABLE", "false").lower() in ("true", "1", "yes", "on")
+    if args.auth_enable is None:
+        auth_enable = _parse_bool_env(os.getenv("REMOTE_AUTH_ENABLE", "false"))
+    else:
+        auth_enable = args.auth_enable
     secret_key = args.secret_key or os.getenv("REMOTE_SECRET_KEY", "")
     
     # Validation for streamable-http mode with authentication
@@ -1549,11 +1559,11 @@ def main(argv: Optional[List[str]] = None):
             logger.warning("This server will accept requests without Bearer token verification.")
             logger.warning("Set REMOTE_AUTH_ENABLE=true and REMOTE_SECRET_KEY to enable authentication.")
 
-    # Note: MCP instance with authentication is already initialized at module level
-    # based on environment variables. CLI arguments will override if different.
-    if auth_enable != _auth_enable or secret_key != _secret_key:
-        logger.warning("CLI authentication settings differ from environment variables.")
-        logger.warning("Environment settings take precedence during module initialization.")
+    # Configure authentication provider before server startup.
+    if auth_enable:
+        mcp.auth = _build_static_token_auth(secret_key)
+    else:
+        mcp.auth = None
 
     # Transport 모드에 따른 실행
     if transport_type == "streamable-http":
