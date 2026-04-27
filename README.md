@@ -369,6 +369,49 @@ python -m mcp_mysql_ops --type streamable-http --host 127.0.0.1 --port 8000
 
 > **💡 Pro Tip**: Use Method 1 (console script) for cleaner integration. Method 2 is useful when you need to modify the source code directly.
 
+### Running Tests
+
+Two test suites are available:
+
+| Suite | File | Requires Docker |
+|-------|------|----------------|
+| Unit tests (version compatibility logic) | `tests/test_version_compat.py` | No |
+| Integration tests (all tools × MySQL 5.7 / 8.0 / 8.4) | `tests/test_tools_integration.py` | Yes |
+
+#### Run everything with a single command
+
+`uv run pytest` automatically starts the Docker test containers (MySQL 5.7, 8.0, 8.4), waits for them to be fully initialized (schema + seed data + Performance Schema), runs all tests, then tears everything down.
+
+```bash
+# Install dev dependencies (one-time)
+uv sync --extra dev
+
+# Run all tests (unit + integration) — Docker is managed automatically
+uv run pytest -v
+
+# Unit tests only (no Docker needed)
+uv run pytest tests/test_version_compat.py -v
+
+# Integration tests only
+uv run pytest tests/test_tools_integration.py -v
+
+# Run against a specific MySQL version only
+uv run pytest -v -k MySQL80
+```
+
+> **Note**: Docker must be running. The test stack uses ports `3357` (MySQL 5.7), `3380` (8.0), and `3384` (8.4) on `127.0.0.1`.
+>
+> If containers are already running (e.g. between repeated debug runs), the test fixture detects them and skips the up/down lifecycle — useful for fast iteration. To pre-start manually:
+>
+> ```bash
+> docker compose -f tests/docker/docker-compose.test.yml up -d
+> uv run pytest -v   # reuses running containers, does not tear down
+> ```
+
+#### Continuous Integration
+
+Every push to `main` and every pull request triggers [`.github/workflows/test.yml`](.github/workflows/test.yml), which runs the unit suite and the full MySQL 5.7 / 8.0 / 8.4 integration matrix on GitHub-hosted runners.
+
 ---
 
 ## (NOTE) Sample Test Data Overview

@@ -1,0 +1,82 @@
+name: Test Suite
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# Restrict GITHUB_TOKEN to read-only (least privilege)
+permissions:
+  contents: read
+
+jobs:
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+
+      - name: Setup Python 3.12
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: uv sync --extra dev
+
+      - name: Run unit tests
+        run: uv run pytest tests/test_version_compat.py -v --tb=short
+
+  integration-tests:
+    name: Integration Tests (MySQL 5.7, 8.0, 8.4)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Start MySQL instances
+        run: docker compose -f tests/docker/docker-compose.test.yml up -d
+
+      - name: Wait for all MySQL instances
+        run: |
+          for svc in mysql57 mysql80 mysql84; do
+            echo "Waiting for $svc to be healthy..."
+            for i in $(seq 1 60); do
+              status=$(docker compose -f tests/docker/docker-compose.test.yml ps $svc --format '{{.Health}}' 2>/dev/null || echo "unknown")
+              if [ "$status" = "healthy" ]; then
+                echo "$svc is ready"
+                break
+              fi
+              if [ $i -eq 60 ]; then
+                echo "Timed out waiting for $svc"
+                docker compose -f tests/docker/docker-compose.test.yml logs $svc
+                exit 1
+              fi
+              sleep 3
+            done
+          done
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+
+      - name: Setup Python 3.12
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: uv sync --extra dev
+
+      - name: Run integration tests
+        run: uv run pytest tests/test_tools_integration.py -v --tb=short
+
+      - name: Tear down MySQL instances
+        if: always()
+        run: docker compose -f tests/docker/docker-compose.test.yml down -v
