@@ -149,16 +149,11 @@ All tools support the `database_name` parameter, allowing analysis across multip
 - **JSON Support**: Enhanced JSON functions and indexing
 - **Security Features**: Role-based access control and improved security
 
-### ✅ **MySQL 5.7 (Supported)**  
+### ✅ **MySQL 5.7.9+ (Supported)**
+- **Minimum Required Version**: 5.7.9 — earlier 5.7.x releases are **not supported** because the server uses `performance_schema.processlist`, introduced in 5.7.9
 - **Core Functionality**: 11 core tools fully supported
 - **Performance Schema**: Basic Performance Schema capabilities (limited features for 8 advanced tools)
 - **Standard Features**: Full Information Schema support and basic monitoring
-
-### ✅ **MySQL 5.7+ (Compatible)**
-- **Core Functionality**: All 11 tools with standard features
-- **Basic Performance Schema**: Standard monitoring capabilities
-- **Information Schema**: Complete metadata access
-- **Standard Features**: Full compatibility with core monitoring functions
 
 ---
 

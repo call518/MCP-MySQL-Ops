@@ -27,7 +27,7 @@ You are working with the **MCP MySQL Operations Server**, a powerful tool that p
 
 ## Features
 
-- ✅ **Zero Configuration**: Works with MySQL 5.7+ and 8.0+ out-of-the-box with automatic version detection.
+- ✅ **Zero Configuration**: Works with MySQL 5.7.9+ and 8.0+ out-of-the-box with automatic version detection.
 - ✅ **Natural Language**: Ask questions like "Show me slow queries" or "Analyze table sizes."
 - ✅ **Production Safe**: Read-only operations, AWS RDS/Aurora MySQL compatible with regular user permissions.
 - ✅ **Performance Schema Integration**: Advanced query analytics using MySQL's built-in Performance Schema.
@@ -461,34 +461,34 @@ Similar to the [MCP-PostgreSQL-Ops](https://github.com/call518/MCP-PostgreSQL-Op
 
 | Tool Name | MySQL Versions | Features | Information Source |
 |-----------|---------------|----------|-------------------|
-| `get_server_info` | MySQL 5.7+ / 8.0+ | ✅ Server version, configuration, status variables | `SHOW VERSION`, `INFORMATION_SCHEMA` |
-| `get_database_list` | MySQL 5.7+ / 8.0+ | ✅ Database sizes, character sets, collations | `INFORMATION_SCHEMA.SCHEMATA`, `information_schema.tables` |
-| `get_table_list` | MySQL 5.7+ / 8.0+ | ✅ Table information, storage engines, row counts | `INFORMATION_SCHEMA.TABLES` |
-| `get_table_schema_info` | MySQL 5.7+ / 8.0+ | ✅ Columns, indexes, constraints, foreign keys | `INFORMATION_SCHEMA.COLUMNS`, `INFORMATION_SCHEMA.STATISTICS` |
-| `get_database_overview` | MySQL 5.7+ / 8.0+ | ✅ Database summary, table counts, sizes | `INFORMATION_SCHEMA.TABLES`, aggregated statistics |
-| `get_user_list` | MySQL 5.7+ / 8.0+ | ✅ MySQL users, hosts, privileges, account status | `mysql.user`, `INFORMATION_SCHEMA.USER_PRIVILEGES` |
-| `get_active_connections` | MySQL 5.7+ / 8.0+ | ✅ Active connections, connection details, process list | `SHOW PROCESSLIST`, `INFORMATION_SCHEMA.PROCESSLIST` |
-| `get_server_status` | MySQL 5.7+ / 8.0+ | ✅ Server status variables, performance counters | `SHOW STATUS`, system status variables |
-| `get_table_size_info` | MySQL 5.7+ / 8.0+ | ✅ Table sizes, index sizes, data/index ratios | `INFORMATION_SCHEMA.TABLES` (DATA_LENGTH, INDEX_LENGTH) |
-| `get_database_size_info` | MySQL 5.7+ / 8.0+ | ✅ Database sizes, storage usage analysis | Aggregated `INFORMATION_SCHEMA.TABLES` data |
-| `get_index_usage_stats` | MySQL 5.7+ / 8.0+ | ✅ Index usage, cardinality, efficiency analysis | `INFORMATION_SCHEMA.STATISTICS`, `SHOW INDEX` |
+| `get_server_info` | MySQL 5.7.9+ / 8.0+ | ✅ Server version, configuration, status variables | `SHOW VERSION`, `INFORMATION_SCHEMA` |
+| `get_database_list` | MySQL 5.7.9+ / 8.0+ | ✅ Database sizes, character sets, collations | `INFORMATION_SCHEMA.SCHEMATA`, `information_schema.tables` |
+| `get_table_list` | MySQL 5.7.9+ / 8.0+ | ✅ Table information, storage engines, row counts | `INFORMATION_SCHEMA.TABLES` |
+| `get_table_schema_info` | MySQL 5.7.9+ / 8.0+ | ✅ Columns, indexes, constraints, foreign keys | `INFORMATION_SCHEMA.COLUMNS`, `INFORMATION_SCHEMA.STATISTICS` |
+| `get_database_overview` | MySQL 5.7.9+ / 8.0+ | ✅ Database summary, table counts, sizes | `INFORMATION_SCHEMA.TABLES`, aggregated statistics |
+| `get_user_list` | MySQL 5.7.9+ / 8.0+ | ✅ MySQL users, hosts, privileges, account status | `mysql.user`, `INFORMATION_SCHEMA.USER_PRIVILEGES` |
+| `get_active_connections` | MySQL 5.7.9+ / 8.0+ | ✅ Active connections, connection details, process list | `performance_schema.processlist` |
+| `get_server_status` | MySQL 5.7.9+ / 8.0+ | ✅ Server status variables, performance counters | `SHOW STATUS`, system status variables |
+| `get_table_size_info` | MySQL 5.7.9+ / 8.0+ | ✅ Table sizes, index sizes, data/index ratios | `INFORMATION_SCHEMA.TABLES` (DATA_LENGTH, INDEX_LENGTH) |
+| `get_database_size_info` | MySQL 5.7.9+ / 8.0+ | ✅ Database sizes, storage usage analysis | Aggregated `INFORMATION_SCHEMA.TABLES` data |
+| `get_index_usage_stats` | MySQL 5.7.9+ / 8.0+ | ✅ Index usage, cardinality, efficiency analysis | `INFORMATION_SCHEMA.STATISTICS`, `SHOW INDEX` |
 
 ### 🚀 **Performance Schema Enhanced Tools (8 Additional Tools)**
 
 | Tool Name | MySQL Versions | Features | Information Source |
 |-----------|---------------|----------|-------------------|
-| `get_mysql_config` | MySQL 5.7+ / 8.0+ | ✅ MySQL configuration variables and settings | `SHOW VARIABLES`, system configuration |
-| `get_slow_queries` | MySQL 5.7+ / 8.0+ | ✅ Slow query analysis and performance insights | `Performance Schema`, slow query log |
-| `get_table_io_stats` | MySQL 5.7+ / 8.0+ | ✅ Table I/O statistics and access patterns | `Performance Schema` I/O monitoring |
-| `get_lock_monitoring` | MySQL 5.7+ / 8.0+ | ✅ Lock analysis and contention monitoring | `Performance Schema` lock tables |
-| `get_all_databases_tables` | MySQL 5.7+ / 8.0+ | ✅ Cross-database table overview and analysis | Multi-database `INFORMATION_SCHEMA` queries |
-| `get_all_databases_table_sizes` | MySQL 5.7+ / 8.0+ | ✅ Global table size analysis across databases | Aggregated size statistics |
-| `get_connection_info` | MySQL 5.7+ / 8.0+ | ✅ Connection details and session information | Enhanced connection monitoring |
-| `get_current_database_info` | MySQL 5.7+ / 8.0+ | ✅ Current database context and details | Active database information |
+| `get_mysql_config` | MySQL 5.7.9+ / 8.0+ | ✅ MySQL configuration variables and settings | `SHOW VARIABLES`, system configuration |
+| `get_slow_queries` | MySQL 5.7.9+ / 8.0+ | ✅ Slow query analysis and performance insights | `Performance Schema`, slow query log |
+| `get_table_io_stats` | MySQL 5.7.9+ / 8.0+ | ✅ Table I/O statistics and access patterns | `Performance Schema` I/O monitoring |
+| `get_lock_monitoring` | MySQL 5.7.9+ / 8.0+ | ✅ Lock analysis and contention monitoring | `Performance Schema` lock tables |
+| `get_all_databases_tables` | MySQL 5.7.9+ / 8.0+ | ✅ Cross-database table overview and analysis | Multi-database `INFORMATION_SCHEMA` queries |
+| `get_all_databases_table_sizes` | MySQL 5.7.9+ / 8.0+ | ✅ Global table size analysis across databases | Aggregated size statistics |
+| `get_connection_info` | MySQL 5.7.9+ / 8.0+ | ✅ Connection details and session information | `performance_schema.processlist` |
+| `get_current_database_info` | MySQL 5.7.9+ / 8.0+ | ✅ Current database context and details | Active database information |
 
 ### 🚀 **Version-Aware Enhancements**
 
-| Feature | MySQL 5.7 | MySQL 8.0+ | Enhanced Capabilities |
+| Feature | MySQL 5.7.9+ | MySQL 8.0+ | Enhanced Capabilities |
 |---------|------------|-------------|---------------------|
 | **Performance Schema** | ✅ Basic | ✅ **Enhanced** | MySQL 8.0+: Advanced query monitoring, improved Performance Schema tables |
 | **Information Schema** | ✅ Standard | ✅ **Enhanced** | MySQL 8.0+: Additional metadata tables and improved statistics |
@@ -496,7 +496,7 @@ Similar to the [MCP-PostgreSQL-Ops](https://github.com/call518/MCP-PostgreSQL-Op
 | **JSON Support** | ✅ Basic | ✅ **Advanced** | MySQL 8.0+: Improved JSON functions and indexing capabilities |
 | **User Management** | ✅ Traditional | ✅ **Role-Based** | MySQL 8.0+: Role-based access control and enhanced security features |
 
-> **📋 MySQL Version Support**: Currently supports MySQL 5.7+ and 8.0+ versions. MySQL 8.1+ and 8.2+ compatibility will be added as they reach stable release status.
+> **📋 MySQL Version Support**: Requires **MySQL 5.7.9 or newer** (5.7.9, 8.0+, 8.4+ are supported). The minimum is dictated by `performance_schema.processlist`, introduced in MySQL 5.7.9 and used by `get_active_connections`, `get_connection_info`, and `get_lock_monitoring`. MySQL 8.1+ and 8.2+ compatibility will be added as they reach stable release status.
 
 ---
 
@@ -679,7 +679,7 @@ python -m mcp_mysql_ops --type streamable-http --host 127.0.0.1 --port 8000 --lo
 ## Prerequisites
 
 ### Minimum Requirements
-- MySQL 5.7+ or MySQL 8.0+ (tested with MySQL 8.0.37)
+- MySQL **5.7.9** or newer (5.7.9+, 8.0+, 8.4+ supported; tested with MySQL 8.0.37). Versions older than 5.7.9 are not supported because the server depends on `performance_schema.processlist`, introduced in 5.7.9.
 - Python 3.11+
 - Network access to MySQL server
 - Read permissions on system databases (`information_schema`, `performance_schema`)
@@ -795,14 +795,14 @@ SET SESSION information_schema_stats_expiry = 0;
   - "Check server system variables and runtime configuration."
   - "Display MySQL server capabilities and version information."
   - 📋 **Features**: Server version, system variables, configuration status, feature availability
-  - 🔧 **MySQL 5.7+/8.0+**: Fully compatible, no additional setup required
+  - 🔧 **MySQL 5.7.9+/8.0+**: Fully compatible, no additional setup required
 
 - **get_database_list**
   - "List all databases and their sizes."
   - "Show database list with character sets and collation information."
   - "Display database storage usage and table counts."
   - 📋 **Features**: Database sizes, character sets, collations, table counts, storage usage
-  - 🔧 **MySQL 5.7+/8.0+**: Uses Information Schema for comprehensive database information
+  - 🔧 **MySQL 5.7.9+/8.0+**: Uses Information Schema for comprehensive database information
 
 - **get_table_list**
   - "List all tables in the test_ecommerce database."
@@ -834,7 +834,7 @@ SET SESSION information_schema_stats_expiry = 0;
   - "Show user accounts with host information and account status."
   - "Display user privilege summary and authentication details."
   - 📋 **Features**: User accounts, host patterns, privileges, account status, authentication info
-  - 🔧 **MySQL 5.7+/8.0+**: Enhanced user management information in MySQL 8.0+
+  - 🔧 **MySQL 5.7.9+/8.0+**: Enhanced user management information in MySQL 8.0+
 
 - **get_active_connections**
   - "Show all active connections and their details."
@@ -842,7 +842,7 @@ SET SESSION information_schema_stats_expiry = 0;
   - "Monitor active sessions and their current operations."
   - "Display connection statistics and process information."
   - 📋 **Features**: Active connections, process list, connection details, session information
-  - 🔧 **MySQL 5.7+/8.0+**: Enhanced process information with Performance Schema integration
+  - 🔧 **MySQL 5.7.9+/8.0+**: Enhanced process information with Performance Schema integration
 
 - **get_server_status**
   - "Show MySQL server status variables and performance counters."
@@ -850,7 +850,7 @@ SET SESSION information_schema_stats_expiry = 0;
   - "Monitor server operational status and key performance indicators."
   - "Analyze server health metrics and resource utilization."
   - 📋 **Features**: Status variables, performance counters, connection statistics, resource metrics
-  - 🔧 **MySQL 5.7+/8.0+**: Comprehensive server status monitoring
+  - 🔧 **MySQL 5.7.9+/8.0+**: Comprehensive server status monitoring
 
 - **get_table_size_info**
   - "Show table and index size analysis for test_ecommerce database."
@@ -866,7 +866,7 @@ SET SESSION information_schema_stats_expiry = 0;
   - "Display comprehensive database size statistics."
   - "Analyze storage distribution across databases."
   - 📋 **Features**: Database sizes, table counts, storage distribution, capacity analysis
-  - 🔧 **MySQL 5.7+/8.0+**: Accurate size calculation using Information Schema
+  - 🔧 **MySQL 5.7.9+/8.0+**: Accurate size calculation using Information Schema
 
 - **get_index_usage_stats**
   - "Analyze index usage and efficiency statistics."
@@ -884,7 +884,7 @@ SET SESSION information_schema_stats_expiry = 0;
   - "Check server compatibility and available enhancements."
   - "Display MySQL version-specific capabilities and recommendations."
   - 📈 **MySQL 8.0+**: Enhanced JSON support, improved Performance Schema, CTE support, window functions
-  - 📊 **MySQL 5.7**: Core functionality with basic JSON and Performance Schema support
+  - 📊 **MySQL 5.7.9+**: Core functionality with basic JSON and Performance Schema support
 
 ### 💡 Natural Language Query Examples
 
@@ -968,8 +968,8 @@ Test tools with realistic prompts - never use function names directly:
 
 2. **Understanding feature availability**:
    - **MySQL 8.0+**: All features available with enhanced Performance Schema
-   - **MySQL 5.7**: Core functionality with basic Performance Schema support
-   - **Earlier versions**: Limited support, consider upgrading
+   - **MySQL 5.7.9+**: Core functionality with basic Performance Schema support
+   - **Earlier versions (< 5.7.9)**: Not supported — `performance_schema.processlist` is unavailable
 
 3. **If features seem limited**:
    - Check MySQL version: `SELECT VERSION();`
@@ -1129,7 +1129,7 @@ uv run pytest
 
 ### Version Compatibility Testing
 
-The MCP server automatically adapts to MySQL versions 5.7+ and 8.0+. To test across versions:
+The MCP server automatically adapts to MySQL versions 5.7.9+ and 8.0+. To test across versions:
 
 1. **Set up test databases**: Different MySQL versions (5.7, 8.0, 8.1+)
 2. **Run compatibility tests**: Point to each version and verify tool behavior

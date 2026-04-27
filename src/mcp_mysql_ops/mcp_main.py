@@ -38,12 +38,13 @@ from .functions import (
     refresh_configs,
 )
 from .version_compat import (
+    ensure_min_supported_version,
     get_mysql_version,
     get_slow_queries_query,
     get_table_io_stats_query,
     get_lock_waits_query,
     get_innodb_status_query,
-    get_replication_status_query
+    get_replication_status_query,
 )
 
 # =============================================================================
@@ -237,8 +238,9 @@ async def get_active_connections(database_name: Optional[str] = None, user_filte
         Formatted string with active connection information
     """
     try:
+        await ensure_min_supported_version(database=database_name)
         query = """
-        SELECT 
+        SELECT
             id as process_id,
             user,
             host,
@@ -247,11 +249,11 @@ async def get_active_connections(database_name: Optional[str] = None, user_filte
             time as duration_sec,
             state,
             SUBSTRING(info, 1, 100) as query_snippet
-        FROM information_schema.processlist
+        FROM performance_schema.processlist
         WHERE command != 'Sleep' OR info IS NOT NULL
         ORDER BY time DESC
         """
-        
+
         result = await execute_query(query, database=database_name)
         
         # Apply filters
@@ -947,7 +949,7 @@ async def get_table_size_info(database_name: Optional[str] = None, limit: int = 
             ROUND(data_length / 1024 / 1024, 2) as data_mb,
             ROUND(index_length / 1024 / 1024, 2) as index_mb,
             ROUND((data_length + index_length) / 1024 / 1024, 2) as total_mb,
-            ROUND(data_length / table_rows, 2) as avg_row_bytes,
+            ROUND(data_length / NULLIF(table_rows, 0), 2) as avg_row_bytes,
             ROUND((index_length / (data_length + index_length)) * 100, 2) as index_ratio_pct
         FROM information_schema.tables
         WHERE table_schema = %s 
@@ -1160,8 +1162,9 @@ async def get_connection_info(database_name: Optional[str] = None) -> str:
         Formatted string with connection information
     """
     try:
+        await ensure_min_supported_version(database=database_name)
         query = """
-        SELECT 
+        SELECT
             id as connection_id,
             user,
             host,
@@ -1170,11 +1173,11 @@ async def get_connection_info(database_name: Optional[str] = None) -> str:
             time as duration_sec,
             state,
             SUBSTRING(COALESCE(info, ''), 1, 100) as current_query
-        FROM information_schema.processlist
+        FROM performance_schema.processlist
         WHERE user != 'system user' AND user IS NOT NULL
         ORDER BY time DESC, id
         """
-        
+
         result = await execute_query(query, database=database_name)
         
         if not result:

@@ -7,7 +7,7 @@ This is a **Model Context Protocol (MCP) server** built with **FastMCP** that pr
 ### Core Components
 - **`mcp_main.py`**: Main MCP server with 19+ `@mcp.tool()` decorated functions
 - **`functions.py`**: Database connection layer using `aiomysql` with multi-database support
-- **`version_compat.py`**: MySQL 5.7+ and 8.0+ version detection and adaptive feature handling
+- **`version_compat.py`**: MySQL 5.7.9+ and 8.0+ version detection and adaptive feature handling (`MIN_SUPPORTED_VERSION = 5.7.9` is enforced via `ensure_min_supported_version`)
 - **`prompt_template.md`**: Comprehensive prompt definitions loaded via `@mcp.prompt()` decorators
 - **Docker stack**: MySQL + MCP server + MCPO proxy + Open WebUI integration
 
@@ -17,7 +17,7 @@ This is a **Model Context Protocol (MCP) server** built with **FastMCP** that pr
 
 **Performance Schema Integration**: Core functionality leverages MySQL's Performance Schema and Information Schema. Tools automatically detect available features and adapt accordingly.
 
-**Version-Aware Tools**: Use `version_compat.py` for MySQL 5.7+/8.0+ compatibility. Tools auto-adapt features based on detected version. **MySQL 8.0+ recommended** for enhanced capabilities.
+**Version-Aware Tools**: Use `version_compat.py` for MySQL 5.7.9+/8.0+ compatibility. Tools auto-adapt features based on detected version, and `ensure_min_supported_version()` raises `UnsupportedMySQLVersionError` for servers older than 5.7.9 (which lack `performance_schema.processlist`). **MySQL 8.0+ recommended** for enhanced capabilities.
 
 **Tool Structure**: Each MCP tool follows this pattern:
 ```python
@@ -92,7 +92,7 @@ async def get_db_connection(database: str = None) -> aiomysql.Connection:
 ### Tool Compatibility Matrix
 When adding new tools, **must** update the compatibility matrix in `README.md`:
 - Classify as Professional MySQL Tools (19 total) or Performance Schema Enhanced Tools
-- Document MySQL version support (5.7+/8.0+)
+- Document MySQL version support (5.7.9+/8.0+)
 - List Information Schema/Performance Schema tables used
 - Update tool count statistics
 
@@ -184,5 +184,5 @@ Test tools with realistic prompts - never use function names directly:
 4. **Environment Loading**: Use `scripts/run-mcp-inspector-local.sh` which properly loads `.env` - direct Python execution won't load environment
 5. **Query Limits**: All tools enforce 1-100 limits for performance; don't assume unlimited results
 6. **aiomysql Parameter Binding**: Use `%s` format, not `$1, $2, ...` - all SQL queries must use aiomysql-compatible parameter binding
-7. **MySQL Version Support**: Currently supports 5.7+/8.0+; latest versions support pending testing
+7. **MySQL Version Support**: Currently supports 5.7.9+/8.0+; latest versions support pending testing
 8. **Version-Specific Features**: Always use `version_compat.py` patterns for new tools that query system tables

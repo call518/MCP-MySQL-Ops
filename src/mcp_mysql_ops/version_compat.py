@@ -13,34 +13,43 @@ logger = logging.getLogger(__name__)
 
 class MySQLVersion:
     """MySQL version information and compatibility utilities."""
-    
+
     def __init__(self, major: int, minor: int = 0, patch: int = 0):
         self.major = major
-        self.minor = minor  
+        self.minor = minor
         self.patch = patch
-        
+
     def __str__(self):
         return f"{self.major}.{self.minor}.{self.patch}"
-        
+
     def __ge__(self, other):
         if isinstance(other, (int, float)):
             return self.major >= other
         if isinstance(other, MySQLVersion):
             return (self.major, self.minor, self.patch) >= (other.major, other.minor, other.patch)
         return False
-    
+
     def __lt__(self, other):
         if isinstance(other, (int, float)):
             return self.major < other
         if isinstance(other, MySQLVersion):
             return (self.major, self.minor, self.patch) < (other.major, other.minor, other.patch)
         return False
-        
+
     @property
     def is_modern(self) -> bool:
         """Check if this is a modern MySQL version (8.0+)."""
         return self.major >= 8
-        
+
+    @property
+    def is_supported(self) -> bool:
+        """Check if this version meets the project's minimum supported version.
+
+        The project requires `performance_schema.processlist`, which was
+        introduced in MySQL 5.7.9. Releases prior to 5.7.9 are not supported.
+        """
+        return self >= MIN_SUPPORTED_VERSION
+
     @property
     def has_performance_schema(self) -> bool:
         """Check if Performance Schema is available (MySQL 5.5+)."""
@@ -72,6 +81,44 @@ class MySQLVersion:
         return self.major >= 5 and (self.major > 5 or self.minor >= 6)
 
 
+# Minimum MySQL version supported by this project. The codebase relies on
+# `performance_schema.processlist`, which was introduced in MySQL 5.7.9
+# (see MySQL 5.7.9 release notes). Connecting to an older server will fail.
+MIN_SUPPORTED_VERSION = MySQLVersion(5, 7, 9)
+
+
+class UnsupportedMySQLVersionError(RuntimeError):
+    """Raised when the connected MySQL server is older than MIN_SUPPORTED_VERSION."""
+
+
+async def ensure_min_supported_version(database: str = None) -> MySQLVersion:
+    """Detect MySQL version and raise if it is below the supported minimum.
+
+    Args:
+        database: Database name to connect to
+
+    Returns:
+        Detected MySQLVersion (only when supported)
+
+    Raises:
+        UnsupportedMySQLVersionError: if the server is older than 5.7.9
+            or version detection fails.
+    """
+    version = await get_mysql_version(database)
+    if version is None:
+        raise UnsupportedMySQLVersionError(
+            "Could not determine MySQL server version; "
+            f"this project requires MySQL {MIN_SUPPORTED_VERSION} or newer."
+        )
+    if not version.is_supported:
+        raise UnsupportedMySQLVersionError(
+            f"MySQL {version} is not supported. This project requires "
+            f"MySQL {MIN_SUPPORTED_VERSION} or newer because it depends on "
+            "`performance_schema.processlist` (introduced in 5.7.9)."
+        )
+    return version
+
+
 async def get_mysql_version(database: str = None) -> Optional[MySQLVersion]:
     """Get MySQL version information.
     
@@ -98,8 +145,17 @@ async def get_mysql_version(database: str = None) -> Optional[MySQLVersion]:
             
         major, minor, patch = map(int, match.groups())
         version = MySQLVersion(major, minor, patch)
-        
+
         logger.info(f"Detected MySQL version: {version}")
+        if not version.is_supported:
+            logger.error(
+                "Detected MySQL %s is below the minimum supported version %s. "
+                "Tools that depend on performance_schema.processlist "
+                "(get_active_connections, get_connection_info, get_lock_monitoring) "
+                "will fail on this server.",
+                version,
+                MIN_SUPPORTED_VERSION,
+            )
         return version
         
     except Exception as e:
@@ -212,7 +268,7 @@ async def get_lock_waits_query(database: str = None) -> str:
             p.state,
             SUBSTRING(p.info, 1, 100) as query_snippet
         FROM performance_schema.data_locks dl
-        LEFT JOIN information_schema.processlist p ON dl.thread_id = p.id
+        LEFT JOIN performance_schema.processlist p ON dl.thread_id = p.id
         WHERE dl.lock_status = 'GRANTED'
         ORDER BY dl.thread_id, dl.object_schema, dl.object_name
         """
