@@ -1,3 +1,5 @@
+[![MseeP.ai Security Assessment Badge](https://mseep.net/pr/call518-mcp-mysql-ops-badge.png)](https://mseep.ai/app/call518-mcp-mysql-ops)
+
 # MCP Server for MySQL Operations and Monitoring
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
