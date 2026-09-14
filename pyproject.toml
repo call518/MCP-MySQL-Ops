@@ -11,6 +11,7 @@ dependencies = [
     "PyMySQL>=1.1.0",
     "setuptools-scm>=10.0.5",
     "pre-commit>=4.6.0",
+    "pytest>=9.0.3",
 ]
 
 [project.optional-dependencies]
@@ -27,7 +28,7 @@ asyncio_mode = "auto"
 testpaths = ["tests"]
 
 [build-system]
-requires = ["setuptools>=61.0", "wheel", "setuptools-scm"]
+requires = ["setuptools>=83.0.0", "wheel", "setuptools-scm"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools_scm]
@@ -48,4 +49,3 @@ where = ["src"]
 
 [tool.setuptools.package-dir]
 "" = "src"
-
