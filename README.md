@@ -14,7 +14,7 @@
 
 ## Architecture & Internal (DeepWiki)
 
-[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/call518/MCP-MySQL-Ops)
+[![Ask DeepWiki](https://img.shields.io/badge/Ask-DeepWiki-blue)](https://deepwiki.com/call518/MCP-MySQL-Ops)
 
 ---
 
