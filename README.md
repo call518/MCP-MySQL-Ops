@@ -1137,24 +1137,6 @@ The MCP server automatically adapts to MySQL versions 5.7.9+ and 8.0+. To test a
 
 ---
 
-### Tag-based package publication and GitHub Releases
-
-The GitHub Actions workflow in `.github/workflows/pypi-publish.yml` runs when a
-tag is pushed. Package versions are derived from the tag by setuptools-scm.
-It builds once with Python 3.12, publishes the distributions to TestPyPI, then
-PyPI, and creates a GitHub Release with the tag as its title.
-
-Maintainers must configure Trusted Publishing for this repository and workflow
-in both registries, using the GitHub environments `testpypi` and `pypi`.
-The Release job uses `GITHUB_TOKEN` with job-scoped `contents: write` permission.
-
-Release notes include full commit messages since the most recently published
-non-draft Release, in oldest-first topological order. The first Release includes
-the full history through the tag. Existing published Releases are preserved;
-an existing draft, a moved tag, or a previous release outside the tag's ancestry
-stops Release creation for manual review. Tags ending in `aN`, `bN`, or `rcN`
-create prereleases. A failed publication blocks subsequent jobs.
-
 ## Security Notes
 
 - All tools are **read-only** - no data modification capabilities
