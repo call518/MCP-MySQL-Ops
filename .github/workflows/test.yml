@@ -31,7 +31,7 @@ jobs:
         run: uv sync --extra dev
 
       - name: Run unit tests
-        run: uv run pytest tests/test_version_compat.py -v --tb=short
+        run: uv run pytest tests/test_version_compat.py tests/test_publish_release.py -v --tb=short
 
   integration-tests:
     name: Integration Tests (MySQL 5.7, 8.0, 8.4)
