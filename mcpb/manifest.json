@@ -1,0 +1,84 @@
+{
+  "manifest_version": "0.4",
+  "name": "mcp-mysql-ops",
+  "display_name": "MySQL Ops",
+  "version": "0.0.0",
+  "description": "Monitor and inspect a MySQL server with an MCP client.",
+  "long_description": "Runs MCP-MySQL-Ops locally over stdio. Claude Desktop installs Python and the locked dependencies with uv.",
+  "author": {
+    "name": "JungJungIn",
+    "url": "https://github.com/call518"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/call518/MCP-MySQL-Ops"
+  },
+  "homepage": "https://github.com/call518/MCP-MySQL-Ops",
+  "documentation": "https://github.com/call518/MCP-MySQL-Ops#claude-desktop-integration",
+  "support": "https://github.com/call518/MCP-MySQL-Ops/issues",
+  "license": "MIT",
+  "keywords": ["mysql", "database", "operations", "monitoring"],
+  "server": {
+    "type": "uv",
+    "entry_point": "server.py",
+    "mcp_config": {
+      "command": "uv",
+      "args": [
+        "run",
+        "--python",
+        "3.12",
+        "--directory",
+        "${__dirname}",
+        "server.py"
+      ],
+      "env": {
+        "SETUPTOOLS_SCM_PRETEND_VERSION": "0.0.0",
+        "MYSQL_HOST": "${user_config.mysql_host}",
+        "MYSQL_PORT": "${user_config.mysql_port}",
+        "MYSQL_USER": "${user_config.mysql_user}",
+        "MYSQL_PASSWORD": "${user_config.mysql_password}",
+        "MYSQL_DATABASE": "${user_config.mysql_database}"
+      }
+    }
+  },
+  "user_config": {
+    "mysql_host": {
+      "type": "string",
+      "title": "MySQL host (MYSQL_HOST)",
+      "description": "Host name or IP address of the MySQL server",
+      "required": true
+    },
+    "mysql_port": {
+      "type": "string",
+      "title": "MySQL port (MYSQL_PORT)",
+      "description": "MySQL server port",
+      "default": "3306",
+      "required": true
+    },
+    "mysql_user": {
+      "type": "string",
+      "title": "MySQL user (MYSQL_USER)",
+      "description": "MySQL account used by the MCP server",
+      "default": "root",
+      "required": true
+    },
+    "mysql_password": {
+      "type": "string",
+      "title": "MySQL password (MYSQL_PASSWORD)",
+      "description": "Password stored securely by Claude Desktop",
+      "sensitive": true,
+      "required": true
+    },
+    "mysql_database": {
+      "type": "string",
+      "title": "Default database (MYSQL_DATABASE)",
+      "description": "Default database for operations that do not specify one",
+      "default": "mysql",
+      "required": true
+    }
+  },
+  "compatibility": {
+    "platforms": ["darwin", "win32", "linux"],
+    "runtimes": {"python": ">=3.12"}
+  }
+}

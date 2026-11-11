@@ -39,7 +39,7 @@ Relates to #(issue number)
 - [ ] Tested on MySQL 16
 - [ ] Tested on MySQL 17
 - [ ] Version-aware implementation (handles differences between versions)
-- [ ] Extension-independent (works without pg_stat_statements/pg_stat_monitor)
+- [ ] Documents any required Performance Schema consumers or instruments
 - [ ] Extension-dependent (requires specific extensions)
 
 ## Testing

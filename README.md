@@ -12,6 +12,128 @@
 
 ---
 
+## What is MCP-MySQL-Ops?
+
+MCP-MySQL-Ops lets Claude Desktop, OpenWebUI, and other MCP clients inspect a
+MySQL server through natural-language requests. Its tools read server status,
+connections, schemas, table sizes, indexes, locks, and Performance Schema data.
+
+Example requests:
+
+```text
+Show the MySQL server version and uptime.
+List active connections.
+Find the largest tables in all databases.
+Show recent slow-query patterns.
+Check lock waits and index usage.
+```
+
+## Quick Start
+
+You need a MySQL account and a server reachable from the computer that runs
+MCP-MySQL-Ops. Choose one path. Claude Desktop uses a local stdio bundle;
+Docker Compose runs the MCP server, OpenWebUI, optional MCPO compatibility
+proxy, and a test MySQL database.
+
+All registered MySQL tools are read-only in both paths.
+
+<a id="claude-desktop-integration"></a>
+
+### Option A: Claude Desktop with MCPB (fastest)
+
+1. Download `mcp-mysql-ops-<version>.mcpb` from the latest
+   [GitHub Release](https://github.com/call518/MCP-MySQL-Ops/releases).
+2. Open **Settings → Extensions → Advanced settings → Install Extension…** and
+   select the file.
+3. Enter the MySQL connection settings. Host and password are required; port,
+   user, and default database are prefilled and can be changed.
+4. Ask: `Show the MySQL server version and uptime.`
+
+The MySQL server must be reachable from the computer running Claude Desktop.
+See the [Claude Desktop guide](docs/claude-desktop-guide.md) for `uvx`, source,
+and troubleshooting options.
+
+### Option B: OpenWebUI with Docker Compose
+
+Requirements: Git, Docker with the Compose plugin, and a model provider for
+OpenWebUI whose model supports tool calling.
+
+**1. Configure**
+
+```bash
+git clone https://github.com/call518/MCP-MySQL-Ops.git
+cd MCP-MySQL-Ops
+cp .env.example .env
+cp mcp-config.json.http mcp-config.json.http.local
+chmod 600 mcp-config.json.http.local
+openssl rand -hex 32   # use the output as WEBUI_SECRET_KEY
+vi .env                # set WEBUI_SECRET_KEY and review the MYSQL_* values
+```
+
+The default stack uses the included MySQL tutorial database. To use an existing
+server, set its `MYSQL_*` values and follow the
+[custom database instructions](docs/openwebui-guide.md#use-an-existing-mysql-server).
+
+**2. Start**
+
+```bash
+docker compose up -d
+docker compose ps      # wait until mcp-server is healthy
+```
+
+This starts OpenWebUI (`http://localhost:3004`), the MCP server
+(`http://localhost:18004/mcp`), MCPO (`http://localhost:8004`), and the tutorial
+MySQL database (`127.0.0.1:13306`). Published ports bind to `127.0.0.1` by
+default.
+
+**3. Connect OpenWebUI to the MCP server**
+
+1. Open `http://localhost:3004`, create the administrator account, and add a
+   model provider under **Settings → Admin → Connections**.
+2. The Quick Start enables tool calling through Chat Completions by default
+   with this setting already present in `.env.example`:
+
+   ```dotenv
+   DEFAULT_MODEL_PARAMS={"reasoning_effort":"none"}
+   ```
+
+   This applies to every model and disables model reasoning. If the
+   `open-webui-data` volume already exists, set the same value under **Settings
+   → Admin → Models → Model Defaults → Model Parameters** because its saved
+   database value takes precedence. To use reasoning through the Responses
+   API, set `DEFAULT_MODEL_PARAMS={}` before the first start and leave
+   **Reasoning Effort** at **Default**; see the
+   [OpenWebUI guide](docs/openwebui-guide.md#34-reasoning-model-compatibility).
+3. Under **Settings → Admin → Tools → Integrations → External Tool Servers**,
+   add a connection of type `MCP (Streamable HTTP)` with URL
+   `http://mcp-server:8000/mcp` and authentication `None`.
+4. Under **Settings → Admin → System → Interface → Chat**, turn on **Tool
+   Search** and **Defer Built-in Tools**, and set **Deferral Threshold** to `0`
+   so that the complete tool list fits the model's limits.
+5. In a new chat, enable the connection under **Integrations → Tools** and ask:
+   `Use mcp-mysql-ops to show the MySQL server version and uptime.`
+
+> **MCPO is optional.** MCPO exposes the MCP tools as an OpenAPI REST server;
+> OpenWebUI does not need it for the direct MCP connection above. To run without
+> MCPO, start only:
+>
+> ```bash
+> docker compose up -d mysql mysql-init-data mcp-server open-webui
+> ```
+
+The [OpenWebUI guide](docs/openwebui-guide.md) explains direct MCP versus MCPO,
+Bearer authentication, model settings, existing MySQL servers, and
+troubleshooting.
+
+### Other installation and operation guides
+
+| Guide | Contents |
+| --- | --- |
+| [Configuration](docs/configuration.md) | MySQL connection, transports, authentication, and local files |
+| [Claude Desktop](docs/claude-desktop-guide.md) | MCPB, `uvx`, source, Docker bridge, and remote connector |
+| [OpenWebUI](docs/openwebui-guide.md) | Direct MCP, MCPO, reasoning models, and troubleshooting |
+| [Development](docs/development.md) | Tests, MCPB builds, and release verification |
+
 ## Architecture & Internal (DeepWiki)
 
 [![Ask DeepWiki](https://img.shields.io/badge/Ask-DeepWiki-blue)](https://deepwiki.com/call518/MCP-MySQL-Ops)
@@ -57,13 +179,14 @@ You are working with the **MCP MySQL Operations Server**, a powerful tool that p
 
 ---
 
-## ⭐ Quickstart (5 minutes)
+## Docker Compose Tutorial
 
 > **Note:** The `mysql` container included in `docker-compose.yml` is intended for quickstart testing purposes only. You can connect to your own MySQL instance by adjusting the environment variables as needed.
 
 > **If you want to use your own MySQL instance instead of the built-in test container:**
 > - Update the target MySQL connection information in your `.env` file (see MYSQL_HOST, MYSQL_PORT, MYSQL_USER, MYSQL_PASSWORD, MYSQL_DATABASE).
-> - In `docker-compose.yml`, comment out (disable) the `mysql` and `mysql-init-data` containers to avoid starting the built-in test database.
+> - Use `docker-compose.custom-db.yml`, which omits the `mysql` and
+>   `mysql-init-data` services.
 
 ### Flow Diagram of Quickstart/Tutorial
 
@@ -85,13 +208,13 @@ cp .env.example .env
 ```bash
 #### MySQL Root Configuration for Docker:
 MYSQL_ROOT_HOST=%
-MYSQL_ROOT_PASSWORD=changeme!@34
+MYSQL_ROOT_PASSWORD=changeme
 
 #### MySQL Host Configuration:
 MYSQL_HOST=host.docker.internal
 MYSQL_PORT=13306
 MYSQL_USER=root
-MYSQL_PASSWORD=${MYSQL_PASSWORD}
+MYSQL_PASSWORD=${MYSQL_ROOT_PASSWORD}
 MYSQL_DATABASE=test_ecommerce
 ```
 
@@ -100,31 +223,30 @@ MYSQL_DATABASE=test_ecommerce
 # Edit .env file with your MySQL connection details
 MYSQL_HOST=your-mysql-server.com
 MYSQL_PORT=3306
-MYSQL_USER=your_username     # Will auto-grant permissions on test DBs
+MYSQL_USER=your_username
 MYSQL_PASSWORD=your_password
 MYSQL_DATABASE=your_default_db
 
-# Then disable built-in containers in docker-compose.yml
-# Comment out: mysql and mysql-init-data services
+# Start the stack without the built-in MySQL services
+docker compose -f docker-compose.custom-db.yml up -d
 ```
 
 > **Note**: The MySQL container is configured with proper volume mapping for data persistence and initial database setup.
 
 **Additional Resources:**
-- **MCP Tool Features (Swagger)**: http://localhost:8004/docs  
-- **MCPO Proxy API Documentation**: http://localhost:8004/mysql-ops/docs
+- **MCPO Proxy API Documentation**: http://localhost:8004/mcp-mysql-ops/docs
 
 ### 2. Run Docker Stack
 
 ```bash
 # Start all services (MySQL + MCP server + test interfaces)
-docker-compose up -d
+docker compose up -d
 
 # Check container status
-docker-compose ps
+docker compose ps
 
 # Watch the logs (Ctrl+C to exit)
-docker-compose logs -f mysql-init-data
+docker compose logs -f mysql-init-data
 ```
 
 **⏱️ Container Startup Sequence & Wait Time:**
@@ -137,10 +259,10 @@ docker-compose logs -f mysql-init-data
 
 ```bash
 # Monitor all container logs
-docker-compose logs -f
+docker compose logs -f
 
 # Check if all containers are healthy
-docker-compose ps
+docker compose ps
 ```
 
 ### 3. Automatic Test Data Generation
@@ -156,7 +278,7 @@ docker-compose ps
 **Manual execution (if needed):**
 ```bash
 # Force regenerate test data (optional)
-docker-compose run --rm mysql-init-data /scripts/create-test-data.sh
+docker compose run --rm mysql-init-data /scripts/create-test-data.sh
 
 # Check generation logs
 docker logs mcp-mysql-ops-mysql-init-data
@@ -172,26 +294,34 @@ docker exec -it mcp-mysql-ops-mysql-8 mysql -u [your_mysql_user] -p -e "SHOW DAT
 
 **🌐 Web Interface:** http://localhost:3004/
 
-> **⏳ Important**: Please wait **2-3 minutes** after running `docker-compose up -d` for all containers to fully initialize. OpenWebUI starts last to ensure all backend services (MySQL, test data generation, MCP server) are ready.
+> **⏳ Important**: Please wait **2-3 minutes** after running `docker compose up -d` for all containers to fully initialize. OpenWebUI starts last to ensure all backend services (MySQL, test data generation, MCP server) are ready.
 
 **Quick Status Check:**
 ```bash
 # Verify all containers are running
-docker-compose ps
+docker compose ps
 
 # If any container shows "starting" or "unhealthy", wait a bit longer
 # You can watch the startup logs:
-docker-compose logs -f
+docker compose logs -f
 ```
 
 ### 5. Registering the Tool in OpenWebUI
 
-> 📌 **Note**: Web-UI configuration instructions are based on OpenWebUI **v0.6.22**. Menu locations and settings may differ in newer versions.
+These instructions match the pinned OpenWebUI **v0.13.3** image.
 
-1. logging in to OpenWebUI with an admin account
-1. go to "Settings" → "Tools" from the top menu.
-1. Enter the `mysql-ops` Tool address (e.g., `http://localhost:8004/mysql-ops`) to connect MCP Tools.
-1. Setup Ollama or OpenAI.
+1. Sign in with the administrator account and configure a model provider under
+   **Settings → Admin → Connections**.
+2. Under **Settings → Admin → Tools → Integrations → External Tool Servers**,
+   add type `MCP (Streamable HTTP)` with URL
+   `http://mcp-server:8000/mcp`.
+3. Under **Settings → Admin → System → Interface → Chat**, enable **Tool
+   Search** and **Defer Built-in Tools**, then set **Deferral Threshold** to
+   `0`.
+4. Enable the connection under **Integrations → Tools** in a new chat.
+
+Use `http://mcpo-proxy:8000/mcp-mysql-ops` only when an OpenAPI connection is
+required. See the [OpenWebUI guide](docs/openwebui-guide.md) for both paths.
 
 ### 6. Complete!
 
@@ -288,6 +418,9 @@ This MCP server supports two connection modes: **stdio** (traditional) and **str
 
 | Variable | Description | Default | Project Default |
 |----------|-------------|---------|-----------------|
+| `DEFAULT_MODEL_PARAMS` | OpenWebUI model defaults seeded on first startup | - | `{"reasoning_effort":"none"}` |
+| `WEBUI_SECRET_KEY` | Stable OpenWebUI encryption and session key | - | placeholder; replace it |
+| `MCPO_CONFIG_FILE` | Ignored local MCP configuration mounted by MCPO | - | `mcp-config.json.http.local` |
 | `PYTHONPATH` | Python module search path for MCP server imports | - | `/app/src` |
 | `MCP_LOG_LEVEL` | Server logging verbosity (DEBUG, INFO, WARNING, ERROR) | `INFO` | `INFO` |
 | `FASTMCP_TYPE` | MCP transport protocol (stdio for CLI, streamable-http for web) | `stdio` | `streamable-http` |
@@ -298,7 +431,7 @@ This MCP server supports two connection modes: **stdio** (traditional) and **str
 | `MYSQL_HOST` | MySQL server hostname or IP address | `127.0.0.1` | `host.docker.internal` |
 | `MYSQL_PORT` | MySQL server port number | `3306` | `13306` |
 | `MYSQL_USER` | Username for MySQL server authentication | `root` | `root` |
-| `MYSQL_PASSWORD` | Password for MySQL server authentication | - | `changeme!@34` |
+| `MYSQL_PASSWORD` | Password for MySQL server authentication | - | `changeme` |
 | `MYSQL_DATABASE` | Name of the default target MySQL database | - | `test_ecommerce` |
 | `DOCKER_EXTERNAL_PORT_OPENWEBUI` | Host port mapping for Open WebUI container | `8080` | `3004` |
 
@@ -510,12 +643,12 @@ Similar to the [MCP-PostgreSQL-Ops](https://github.com/call518/MCP-PostgreSQL-Op
   "mcpServers": {
     "mcp-mysql-ops": {
       "command": "uvx",
-      "args": ["--python", "3.11", "mcp-mysql-ops"],
+      "args": ["--python", "3.12", "mcp-mysql-ops"],
       "env": {
         "MYSQL_HOST": "127.0.0.1",
         "MYSQL_PORT": "13306",
         "MYSQL_USER": "root",
-        "MYSQL_PASSWORD": "changeme!@34",
+        "MYSQL_PASSWORD": "changeme",
         "MYSQL_DATABASE": "test_ecommerce"
       }
     }
@@ -567,13 +700,13 @@ Similar to the [MCP-PostgreSQL-Ops](https://github.com/call518/MCP-PostgreSQL-Op
   "mcpServers": {
     "mcp-mysql-ops": {
       "command": "uv",
-      "args": ["run", "python", "-m", "src.mcp_mysql_ops.mcp_main"],
+      "args": ["run", "--directory", "/path/to/MCP-MySQL-Ops", "mcp-mysql-ops"],
       "env": {
         "PYTHONPATH": "/path/to/MCP-MySQL-Ops",
         "MYSQL_HOST": "127.0.0.1",
         "MYSQL_PORT": "13306",
         "MYSQL_USER": "root",
-        "MYSQL_PASSWORD": "changeme!@34",
+        "MYSQL_PASSWORD": "changeme",
         "MYSQL_DATABASE": "test_ecommerce"
       }
     }
@@ -581,17 +714,17 @@ Similar to the [MCP-PostgreSQL-Ops](https://github.com/call518/MCP-PostgreSQL-Op
 }
 ```
 
-### Run MCP-Server as Standalon
+### Run MCP Server Standalone
 
 #### /w Pypi and uvx (Recommended)
 
 ```bash
 # Stdio mode
-uvx --python 3.11 mcp-mysql-ops \
+uvx --python 3.12 mcp-mysql-ops \
   --type stdio
 
 # HTTP mode
-uvx --python 3.11 mcp-mysql-ops
+uvx --python 3.12 mcp-mysql-ops \
   --type streamable-http \
   --host 127.0.0.1 \
   --port 8000 \
@@ -605,7 +738,7 @@ uvx --python 3.11 mcp-mysql-ops
   "mcpServers": {
     "MySQL-A": {
       "command": "uvx",
-      "args": ["--python", "3.11", "mcp-mysql-ops"],
+      "args": ["--python", "3.12", "mcp-mysql-ops"],
       "env": {
         "MYSQL_HOST": "a.foo.com",
         "MYSQL_PORT": "3306",
@@ -616,7 +749,7 @@ uvx --python 3.11 mcp-mysql-ops
     },
     "MySQL-B": {
       "command": "uvx",
-      "args": ["--python", "3.11", "mcp-mysql-ops"],
+      "args": ["--python", "3.12", "mcp-mysql-ops"],
       "env": {
         "MYSQL_HOST": "b.bar.com",
         "MYSQL_PORT": "3306",
@@ -653,14 +786,15 @@ python -m mcp_mysql_ops --type streamable-http --host 127.0.0.1 --port 8000 --lo
 | `FASTMCP_TYPE` | MCP transport protocol (stdio for CLI, streamable-http for web) | `stdio` | `streamable-http` |
 | `FASTMCP_HOST` | HTTP server bind address (0.0.0.0 for all interfaces) | `127.0.0.1` | `0.0.0.0` |
 | `FASTMCP_PORT` | HTTP server port for MCP communication | `8000` | `8000` |
-| `MYSQL_VERSION` | MySQL major version for Docker image selection | `8.0` | `8.0` |
-| `MYSQL_HOST` | MySQL server hostname or IP address | `127.0.0.1` | `host.docker.internal` |
+| `MYSQL_VERSION` | MySQL major version used in container naming | - | `8` |
+| `MYSQL_HOST` | MySQL server hostname or IP address | `localhost` | `host.docker.internal` |
 | `MYSQL_PORT` | MySQL server port number | `3306` | `13306` |
-| `MYSQL_USER` | MySQL connection username (auto-granted permissions on test DBs) | `root` | `testuser` |
-| `MYSQL_PASSWORD` | MySQL user password (supports special characters) | `changeme!@34` | `testpass` |
-| `MYSQL_DATABASE` | Default database name for connections | `information_schema` | `testdb` |
+| `MYSQL_USER` | MySQL connection username (auto-granted permissions on test DBs) | `root` | `root` |
+| `MYSQL_PASSWORD` | MySQL user password | empty | `changeme` |
+| `MYSQL_DATABASE` | Default database name for connections | `mysql` | `test_ecommerce` |
 | `MYSQL_ROOT_HOST` | MySQL root host access pattern for Docker container | `%` | `%` |
-| `MYSQL_ROOT_PASSWORD` | MySQL root password for Docker container initialization | `changeme!@34` | `changeme!@34` |
+| `MYSQL_ROOT_PASSWORD` | MySQL root password for Docker container initialization | `changeme` | `changeme` |
+| `DOCKER_BIND_ADDRESS` | Host address for published Compose ports | `127.0.0.1` | `127.0.0.1` |
 | `DOCKER_EXTERNAL_PORT_OPENWEBUI` | Host port mapping for Open WebUI container | `8080` | `3004` |
 | `DOCKER_EXTERNAL_PORT_MCP_SERVER` | Host port mapping for MCP server container | `8000` | `18004` |
 | `DOCKER_EXTERNAL_PORT_MCPO_PROXY` | Host port mapping for MCPO proxy container | `8000` | `8004` |
@@ -679,7 +813,7 @@ python -m mcp_mysql_ops --type streamable-http --host 127.0.0.1 --port 8000 --lo
 
 ### Minimum Requirements
 - MySQL **5.7.9** or newer (5.7.9+, 8.0+, 8.4+ supported; tested with MySQL 8.0.37). Versions older than 5.7.9 are not supported because the server depends on `performance_schema.processlist`, introduced in 5.7.9.
-- Python 3.11+
+- Python 3.12+
 - Network access to MySQL server
 - Read permissions on system databases (`information_schema`, `performance_schema`)
 
@@ -982,8 +1116,8 @@ Test tools with realistic prompts - never use function names directly:
 
 2. **Container startup issues**: Check Docker logs
    ```bash
-   docker-compose logs mysql
-   docker-compose logs mcp-server
+   docker compose logs mysql
+   docker compose logs mcp-server
    ```
 
 3. **Data persistence**: Ensure volume mounts are working
@@ -1091,8 +1225,8 @@ Add your tool description to `src/<package_name>/prompt_template.md` for better 
 ./scripts/run-mcp-inspector-local.sh
 
 # Or with Docker
-docker-compose up -d
-docker-compose logs -f mcp-server
+docker compose up -d
+docker compose logs -f mcp-server
 
 # Test with natural language:
 # "Show me your custom analysis"
@@ -1166,7 +1300,7 @@ We're always excited to welcome new contributors! Whether you're fixing a typo, 
 
 ## MCPO Swagger Docs
 
-> [MCPO Swagger URL] http://localhost:8004/mysql-ops/docs
+> [MCPO Swagger URL] http://localhost:8004/mcp-mysql-ops/docs
 
 ![MCPO Swagger APIs](img/screenshot-swagger-api-docs.png)
 

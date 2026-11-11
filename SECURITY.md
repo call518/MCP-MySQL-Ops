@@ -57,7 +57,7 @@ Our MCP server handles sensitive database operations. Key security areas include
 - **Data Exposure**: Sensitive information masking in outputs
 - **Access Control**: Permission requirements, privilege escalation prevention
 - **Network Security**: Connection encryption, host validation
-- **Extension Security**: Safe handling of pg_stat_statements and pg_stat_monitor data
+- **Performance Data Security**: Safe handling of Performance Schema query and session data
 - **MCP Transport Security**: Secure client-server communication
 
 ### 🛡️ Built-in Security Features
@@ -66,7 +66,7 @@ Our MCP server handles sensitive database operations. Key security areas include
 - **Input Validation**: Query parameters are validated and sanitized
 - **Credential Masking**: Passwords and sensitive data are masked in logs/outputs
 - **Least Privilege**: Operates with minimal required database permissions
-- **Version Compatibility**: Secure handling across MySQL 12-17
+- **Version Compatibility**: Secure handling across supported MySQL 5.7.9, 8.0, and 8.4 releases
 
 ## Vulnerability Response Process
 
@@ -96,7 +96,7 @@ We follow industry-standard CVSS scoring:
 - **Regularly rotate credentials** and connection strings
 - **Monitor access logs** for unusual activity
 - **Keep MySQL updated** to latest supported version
-- **Secure extension data**: Be aware that pg_stat_statements contains query text and execution statistics
+- **Secure monitoring data**: Performance Schema can contain query text, account names, and execution statistics
 
 ### 🛡️ Configuration Security
 

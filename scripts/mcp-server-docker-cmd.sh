@@ -13,7 +13,7 @@ else
   return 1 2>/dev/null || exit 1
 fi
 
-echo "Starting OpenStack MCP server with environment variables from .env:"
+echo "Starting MCP server with environment variables from .env:"
 echo "================================"
 
 # Read and display all environment variables from .env file

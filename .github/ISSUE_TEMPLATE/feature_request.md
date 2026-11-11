@@ -31,8 +31,8 @@ assignees: ''
 
 ### Extension Dependencies
 - [ ] No extensions required
-- [ ] Requires pg_stat_statements
-- [ ] Requires pg_stat_monitor
+- [ ] Requires Performance Schema
+- [ ] Requires specific Performance Schema consumers or instruments
 - [ ] Requires other extensions: ___
 
 ## Tool Category

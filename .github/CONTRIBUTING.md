@@ -7,7 +7,7 @@
 ### Prerequisites
 
 - MySQL 5.7+ or 8.0+ (for testing)
-- Python 3.11+
+- Python 3.12+
 - UV package manager
 - Git
 
@@ -27,7 +27,7 @@
 
 3. **Start the test environment:**
    ```bash
-   docker-compose up -d
+   docker compose up -d
    ```
 
 4. **Test the setup:**
@@ -116,7 +116,7 @@ The codebase is designed to be developer-friendly. To add a new monitoring tool:
    - Use read-only queries only
 
 3. **Test across MySQL versions:**
-   - Test with MySQL 12, 15, 16, 17 if possible
+   - Test with MySQL 5.7.9, 8.0, and 8.4 if possible
    - Ensure graceful degradation for version-specific features
    - Update the Tool Compatibility Matrix in README
 
@@ -158,7 +158,7 @@ Help improve our documentation by:
 
 ### Version Compatibility
 
-- **Support MySQL 12-17**
+- **Support MySQL 5.7.9, 8.0, and 8.4**
 - Use version detection: `get_mysqlql_version()`
 - Handle version-specific features gracefully
 - Update compatibility matrix when adding features
@@ -202,7 +202,7 @@ Help improve our documentation by:
    git commit -m "Add tool for monitoring connection pooling
    
    - New get_connection_pool_stats function
-   - Compatible with MySQL 12-17
+   - Compatible with supported MySQL 5.7.9, 8.0, and 8.4 releases
    - Handles missing Performance Schema gracefully"
    ```
 

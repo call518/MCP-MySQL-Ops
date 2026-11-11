@@ -15,5 +15,12 @@ wheels/
 .vscode*
 #.github/copilot-instructions.md
 
+# Environment and local MCP configuration files
 .env
+.env.*
+!.env.example
+mcp-config.json.*.local
 *.swp
+
+# Windows download metadata
+*:Zone.Identifier

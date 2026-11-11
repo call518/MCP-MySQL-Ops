@@ -17,15 +17,30 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-python@v7
         with:
-          python-version: "3.12"
-      - name: Install build tool
-        run: pip install --upgrade build
+          python-version: "3.12.x"
+      - name: Install build and release test tools
+        run: pip install --upgrade build pytest PyYAML
+      - name: Test release automation
+        run: python -m pytest -q tests/test_publish_release.py tests/test_release.py tests/test_mcpb_manifest.py
       - name: Build distributions
         run: python -m build
+      - name: Verify tag and distribution versions
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: python -m scripts.check_release "$RELEASE_TAG" dist
       - uses: actions/upload-artifact@v7
         with:
           name: dist
           path: dist/
+          if-no-files-found: error
+      - name: Build Claude Desktop bundle
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: scripts/build-mcpb.sh "${RELEASE_TAG#v}" mcpb-dist
+      - uses: actions/upload-artifact@v7
+        with:
+          name: mcpb
+          path: mcpb-dist/
           if-no-files-found: error
 
   publish-to-testpypi:
@@ -83,9 +98,14 @@ jobs:
       GH_TOKEN: ${{ github.token }}
       RELEASE_TAG: ${{ github.ref_name }}
     steps:
-      - uses: actions/checkout@v7
+      - name: Check Out Tagged Repository
+        uses: actions/checkout@v7
         with:
           persist-credentials: false
           fetch-depth: 0
+      - uses: actions/download-artifact@v8
+        with:
+          name: mcpb
+          path: mcpb-dist/
       - name: Publish Release with Commit Messages
-        run: python3 -m scripts.publish_release "$RELEASE_TAG"
+        run: python3 -m scripts.publish_release "$RELEASE_TAG" mcpb-dist/*.mcpb
