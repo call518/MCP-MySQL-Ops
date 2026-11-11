@@ -2,11 +2,13 @@
 
 import json
 import re
+import tomllib
 from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
 MANIFEST = json.loads((ROOT / "mcpb" / "manifest.json").read_text())
+PROJECT = tomllib.loads((ROOT / "pyproject.toml").read_text())
 ENV = MANIFEST["server"]["mcp_config"]["env"]
 CONFIG = MANIFEST["user_config"]
 
@@ -41,3 +43,9 @@ def test_bundle_runs_the_stdio_entry_point_with_uv():
     assert (ROOT / "mcpb" / "server.py").is_file()
     assert server["mcp_config"]["args"][1:3] == ["--python", "3.12"]
     assert server["mcp_config"]["args"][-1] == "server.py"
+
+
+def test_bundle_install_and_runtime_use_python_312():
+    python_requirement = ">=3.12,<3.13"
+    assert PROJECT["project"]["requires-python"] == python_requirement
+    assert MANIFEST["compatibility"]["runtimes"]["python"] == python_requirement
