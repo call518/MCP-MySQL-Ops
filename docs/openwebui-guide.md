@@ -77,10 +77,23 @@ create or modify a MySQL server.
 
 ## 3. Configure OpenWebUI 0.13
 
-First configure a model provider under **Settings → Admin → Connections**. For
-an OpenAI connection (`https://api.openai.com/v1`), set **API Type** to **Chat
-Completions** in the connection dialog for the Quick Start default (see
-[3.4](#34-reasoning-model-compatibility)), then save it.
+Open `http://localhost:3004`, create the first administrator account, and add a
+model provider. This step applies to both the direct MCP connection and MCPO.
+Use a model with reliable native function calling.
+
+- **OpenAI:** under **Settings → Admin → Connections**, add a connection with
+  URL `https://api.openai.com/v1`, **Auth** `Bearer` with your OpenAI API key,
+  and **API Type** set to **Chat Completions** for the Quick Start default (see
+  [3.4](#34-reasoning-model-compatibility)), then save it. With **Responses**,
+  every request fails while `DEFAULT_MODEL_PARAMS` sets `reasoning_effort`.
+- **Ollama on the Docker host:** the Compose files already point OpenWebUI to
+  `http://host.docker.internal:11434`. Ensure Ollama listens where Docker can
+  reach it and select a tool-capable model.
+- **Another OpenAI-compatible provider:** add its base URL and API key under
+  **Settings → Admin → Connections**.
+
+Confirm that the selected model appears in a new chat before configuring the
+MCP connection.
 
 ### 3.1 Direct MCP connection
 

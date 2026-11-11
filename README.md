@@ -86,13 +86,16 @@ This starts OpenWebUI (`http://localhost:3004`), the MCP server
 MySQL database (`127.0.0.1:13306`). Published ports bind to `127.0.0.1` by
 default.
 
-**3. Connect OpenWebUI to the MCP server**
+**3. Connect a model provider**
 
-1. Open `http://localhost:3004`, create the administrator account, and add a
-   model provider under **Settings → Admin → Connections**. For an OpenAI
-   connection, set **API Type** to **Chat Completions** in the connection
-   dialog before saving it.
-2. The Quick Start calls tools through Chat Completions with model reasoning
+These steps apply to both the direct MCP connection and MCPO.
+
+1. Open `http://localhost:3004` and create the administrator account.
+2. Under **Settings → Admin → Connections**, add an OpenAI connection with URL
+   `https://api.openai.com/v1`, **Auth** `Bearer` with your OpenAI API key, and
+   **API Type** set to **Chat Completions**, then save it. For another provider,
+   see the [OpenWebUI guide](docs/openwebui-guide.md#3-configure-openwebui-013).
+3. The Quick Start calls tools through Chat Completions with model reasoning
    turned off, using this default already present in `.env.example`:
 
    ```dotenv
@@ -107,13 +110,16 @@ default.
    Defaults → Model Parameters** because its saved database value takes
    precedence. To keep model reasoning through **Responses** instead, see the
    [OpenWebUI guide](docs/openwebui-guide.md#34-reasoning-model-compatibility).
-3. Under **Settings → Admin → Tools → Integrations → External Tool Servers**,
+
+**4. Connect the MCP server**
+
+1. Under **Settings → Admin → Tools → Integrations → External Tool Servers**,
    add a connection of type `MCP (Streamable HTTP)` with URL
    `http://mcp-server:8000/mcp` and authentication `None`.
-4. Under **Settings → Admin → System → Interface → Chat**, turn on **Tool
+2. Under **Settings → Admin → System → Interface → Chat**, turn on **Tool
    Search** and **Defer Built-in Tools**, and set **Deferral Threshold** to `0`
    so that the complete tool list fits the model's limits.
-5. In a new chat, enable the connection under **Integrations → Tools** and ask:
+3. In a new chat, enable the connection under **Integrations → Tools** and ask:
    `Use mcp-mysql-ops to show the MySQL server version and uptime.`
 
 > **MCPO is optional.** MCPO exposes the MCP tools as an OpenAPI REST server;
@@ -314,7 +320,10 @@ docker compose logs -f
 These instructions match the pinned OpenWebUI **v0.13.3** image.
 
 1. Sign in with the administrator account and configure a model provider under
-   **Settings → Admin → Connections**.
+   **Settings → Admin → Connections**. For OpenAI, use URL
+   `https://api.openai.com/v1`, **Auth** `Bearer` with your OpenAI API key, and
+   **API Type** **Chat Completions** (see the
+   [Quick Start](#option-b-openwebui-with-docker-compose)).
 2. Under **Settings → Admin → Tools → Integrations → External Tool Servers**,
    add type `MCP (Streamable HTTP)` with URL
    `http://mcp-server:8000/mcp`.
