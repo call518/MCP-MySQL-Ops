@@ -77,7 +77,10 @@ create or modify a MySQL server.
 
 ## 3. Configure OpenWebUI 0.13
 
-First configure a model provider under **Settings → Admin → Connections**.
+First configure a model provider under **Settings → Admin → Connections**. For
+an OpenAI connection (`https://api.openai.com/v1`), set **API Type** to **Chat
+Completions** in the connection dialog for the Quick Start default (see
+[3.4](#34-reasoning-model-compatibility)), then save it.
 
 ### 3.1 Direct MCP connection
 
@@ -116,22 +119,43 @@ docker compose up -d mysql mysql-init-data mcp-server open-webui
 
 ### 3.4 Reasoning model compatibility
 
+For OpenAI reasoning models, the connection's **API Type** and the **Reasoning
+Effort** parameter must match. Set **API Type** under **Settings → Admin →
+Connections → edit the OpenAI connection**, and use one of these combinations:
+
+| Setup | API Type | Reasoning Effort | Result |
+| --- | --- | --- | --- |
+| Quick Start default | **Chat Completions** | `none` (from `DEFAULT_MODEL_PARAMS`) | Tools work; model reasoning is off |
+| Reasoning with tools | **Responses** | **Default** in every scope | Tools work; the model uses its default reasoning effort |
+
+Other combinations fail with OpenWebUI 0.13:
+
+- **Responses** with any `reasoning_effort` value, including `none`: OpenWebUI
+  sends the Chat Completions parameter `reasoning_effort` unchanged, and the
+  Responses API rejects it with `Unsupported parameter: 'reasoning_effort'`.
+- **Chat Completions** with a reasoning effort other than `none`: the API
+  rejects the request with `Function tools with reasoning_effort are not
+  supported`.
+
 `.env.example` seeds this global value on the first OpenWebUI startup:
 
 ```dotenv
 DEFAULT_MODEL_PARAMS={"reasoning_effort":"none"}
 ```
 
-Some OpenAI reasoning models reject function tools through Chat Completions
-when reasoning effort is enabled. If the `open-webui-data` volume already
-exists, change the model defaults in the Admin UI; editing `.env` alone may not
-replace the saved database value. Per-model and per-chat settings can override
-the global default. Providers that reject this parameter should remove the
-global value and configure only the affected model.
+If the `open-webui-data` volume already exists, change the model defaults in
+the Admin UI; editing `.env` alone may not replace the saved database value.
+Per-model and per-chat settings can override the global default. Providers that
+reject this parameter should remove the global value and configure only the
+affected model.
 
-To use reasoning through the Responses API, set `DEFAULT_MODEL_PARAMS={}`
-before the first startup and leave **Reasoning Effort** at **Default**. Existing
-volumes require the equivalent change in the Admin UI.
+To use reasoning instead, set `DEFAULT_MODEL_PARAMS={}` before the first
+startup, set the connection's **API Type** to **Responses**, and leave
+**Reasoning Effort** at **Default** under **Settings → Admin → Models → Model
+Defaults** and **Settings → Admin → Models → _model_ → Advanced Params**. Remove
+any `reasoning_effort` or `reasoning` override from the chat's **Controls →
+Advanced Params** and **Settings → General → Advanced Parameters**, then start a
+new chat. Existing volumes require the equivalent change in the Admin UI.
 
 Do not delete an existing OpenWebUI volume as a troubleshooting shortcut.
 
@@ -145,6 +169,15 @@ generated operations are present.
 
 - `401 Unauthorized`: check `REMOTE_AUTH_ENABLE`, the server secret, the local
   MCPO Authorization header, placeholders, and container recreation.
+- `Unsupported parameter: 'reasoning_effort'`: the OpenAI connection uses
+  **API Type: Responses** while a `reasoning_effort` value (even `none`) is
+  set. Set **API Type** to **Chat Completions** (Quick Start default), or keep
+  **Responses** and set Reasoning Effort to **Default** in every scope; then
+  start a new chat.
+- `Function tools with reasoning_effort are not supported`: Chat Completions
+  received function tools with a reasoning effort other than `none`. Set it to
+  `none`, or switch **API Type** to **Responses** as described in
+  [3.4](#34-reasoning-model-compatibility).
 - Direct MCP works but MCPO fails: inspect the MCPO local config independently;
   the two paths have separate client settings.
 - MCPO reports an expired or unknown MCP session after the server restarts:
