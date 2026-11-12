@@ -28,6 +28,11 @@ Show recent slow-query patterns.
 Check lock waits and index usage.
 ```
 
+**More requests to try:** see
+[Example queries by area](docs/usage-guide.md#example-queries-by-area) for
+exploratory analysis, performance monitoring, capacity planning, and
+administration and maintenance.
+
 ## Quick Start
 
 You need a MySQL account and a server reachable from the computer that runs
@@ -138,6 +143,7 @@ troubleshooting.
 
 | Guide | Contents |
 | --- | --- |
+| [Usage](docs/usage-guide.md) | [Example queries by area](docs/usage-guide.md#example-queries-by-area) |
 | [Configuration](docs/configuration.md) | MySQL connection, transports, authentication, and local files |
 | [Claude Desktop](docs/claude-desktop-guide.md) | MCPB, `uvx`, source, Docker bridge, and remote connector |
 | [OpenWebUI](docs/openwebui-guide.md) | Direct MCP, MCPO, reasoning models, and troubleshooting |
@@ -1216,19 +1222,15 @@ from .functions import (
 )
 ```
 
-#### 4. **Update Prompt Template (Recommended)**
+#### 4. **Document Your Tool (Recommended)**
 
-Add your tool description to `src/<package_name>/prompt_template.md` for better natural language recognition:
-
-```markdown
-### **Your Custom Analysis Tool**
-
-### X. **get_your_custom_analysis**
-**Purpose**: Brief description of what your tool does
-**Usage**: "Show me your custom analysis" or "Get custom analysis for database_name"
-**Features**: Data aggregation, resource monitoring, performance metrics
-**Required**: `target_name` parameter for specific resource analysis
-```
+- Describe the tool's purpose, parameters, and use cases in its docstring.
+  Clients send this description to the model.
+- Add example requests to
+  [Example queries by area](docs/usage-guide.md#example-queries-by-area).
+- Edit `src/<package_name>/server_instructions.md` only when a rule that
+  spans several tools changes. Keep it at 4,096 characters or fewer;
+  Claude Code truncates longer instructions.
 
 #### 5. **Test Your Tool**
 

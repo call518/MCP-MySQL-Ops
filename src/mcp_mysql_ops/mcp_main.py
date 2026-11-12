@@ -30,9 +30,6 @@ from .functions import (
     check_slow_query_log_enabled,
     get_slow_query_data,
     sanitize_connection_info,
-    read_prompt_template,
-    parse_prompt_sections,
-    get_prompt_template,
     get_current_database_name,
     MYSQL_CONFIG,
     refresh_configs,
@@ -81,63 +78,17 @@ def _build_static_token_auth(secret_key: str) -> StaticTokenVerifier:
 # Initialize MCP instance once for decorator registration.
 # Runtime authentication is configured in main() before mcp.run().
 logger.info("Initializing MCP instance")
-mcp = FastMCP("mcp-mysql-ops")
 
-# =============================================================================
-# Server initialization
-# =============================================================================
+# Server instructions are sent to clients at initialization. Claude Code
+# truncates them after 4,096 characters, so keep the file short and limited
+# to rules that span several tools.
+SERVER_INSTRUCTIONS_PATH = os.path.join(
+    os.path.dirname(__file__), "server_instructions.md"
+)
+with open(SERVER_INSTRUCTIONS_PATH, encoding="utf-8") as f:
+    SERVER_INSTRUCTIONS = f.read().strip()
 
-# Prompt template path
-PROMPT_TEMPLATE_PATH = os.path.join(os.path.dirname(__file__), "prompt_template.md")
-
-# =============================================================================
-# Prompt Templates
-# =============================================================================
-
-@mcp.prompt()
-def prompt_template_full() -> str:
-    """Complete MySQL Operations guidance template with all tool descriptions and usage examples."""
-    try:
-        return read_prompt_template()
-    except Exception as e:
-        logger.error(f"Failed to load full prompt template: {e}")
-        return f"Error loading prompt template: {e}"
-
-@mcp.prompt()
-def prompt_template_headings() -> str:
-    """List of available prompt template sections and tools."""
-    try:
-        content = read_prompt_template()
-        sections = parse_prompt_sections(content)
-        headings = [f"## {heading}" for heading in sections.keys()]
-        return "\n".join(headings)
-    except Exception as e:
-        logger.error(f"Failed to load prompt headings: {e}")
-        return f"Error loading prompt headings: {e}"
-
-
-@mcp.prompt()
-def prompt_template_section(section: str = "") -> str:
-    """Get a specific section from the prompt template.
-    
-    Args:
-        section: The name of the section to retrieve (if empty, shows available sections)
-        
-    Returns:
-        The content of the specified section or list of available sections
-    """
-    try:
-        if not section or section.strip() == "":
-            # If no section specified, show available sections
-            content = read_prompt_template()
-            sections = parse_prompt_sections(content)
-            available_sections = list(sections.keys())
-            return f"Available prompt template sections:\n\n" + "\n".join([f"- {s}" for s in available_sections])
-        
-        return get_prompt_template(section)
-    except Exception as e:
-        logger.error(f"Failed to load prompt section '{section}': {e}")
-        return f"Error loading prompt section '{section}': {e}"
+mcp = FastMCP("mcp-mysql-ops", instructions=SERVER_INSTRUCTIONS)
 
 # =============================================================================
 # MCP Tools (MySQL Operations Tools)
