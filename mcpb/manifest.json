@@ -1,7 +1,7 @@
 {
   "manifest_version": "0.4",
   "name": "mcp-mysql-ops",
-  "display_name": "MySQL Ops",
+  "display_name": "MCP-MySQL-Ops",
   "version": "0.0.0",
   "description": "Monitor and inspect a MySQL server with an MCP client.",
   "long_description": "Runs MCP-MySQL-Ops locally over stdio. Claude Desktop installs Python and the locked dependencies with uv.",
@@ -17,6 +17,7 @@
   "documentation": "https://github.com/call518/MCP-MySQL-Ops#claude-desktop-integration",
   "support": "https://github.com/call518/MCP-MySQL-Ops/issues",
   "license": "MIT",
+  "icon": "icon.png",
   "keywords": ["mysql", "database", "operations", "monitoring"],
   "server": {
     "type": "uv",

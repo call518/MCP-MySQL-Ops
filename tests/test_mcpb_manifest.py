@@ -49,3 +49,10 @@ def test_bundle_install_and_runtime_use_python_312():
     python_requirement = ">=3.12,<3.13"
     assert PROJECT["project"]["requires-python"] == python_requirement
     assert MANIFEST["compatibility"]["runtimes"]["python"] == python_requirement
+
+
+def test_bundle_icon_is_packed_from_the_repository_image():
+    assert MANIFEST["icon"] == "icon.png"
+    assert (ROOT / "img" / "icon-mysql.png").is_file()
+    build = (ROOT / "scripts" / "build-mcpb.sh").read_text()
+    assert '"$ROOT/img/icon-mysql.png" "$STAGE/icon.png"' in build
